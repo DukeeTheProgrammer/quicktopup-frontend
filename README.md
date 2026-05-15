@@ -1,70 +1,145 @@
-# Getting Started with Create React App
+# QuickTopUp.ng Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+> ⚡ A fast, modern VTU (Virtual Top-Up) web app for Nigerian mobile services — built with React.
 
-## Available Scripts
+![React](https://img.shields.io/badge/React-18-61dafb?logo=react) ![License](https://img.shields.io/badge/license-MIT-green) ![Status](https://img.shields.io/badge/status-production--ready-brightgreen)
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## 📱 Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- 🔐 **Authentication** — Register, Login, Forgot/Reset Password
+- 💰 **Wallet** — Fund wallet, view balance, transaction ledger
+- 📱 **Airtime** — Buy airtime for MTN, Airtel, Glo, 9Mobile
+- 📶 **Data Bundles** — Browse and buy data plans by network
+- 📺 **Cable TV** — Subscribe to DSTV, GOtv, Startimes, Showmax
+- ⚡ **Electricity** — Pay electricity bills (all DISCOs supported)
+- 📋 **Transaction History** — Filter by status, service type, date range
+- 🔔 **Notifications** — In-app alerts with mark-as-read
+- 👤 **Profile & Security** — Update personal info, manage security settings
+- 🔒 **PIN Modal** — 4-digit transaction PIN for all purchases
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## 🛠 Tech Stack
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+| Layer | Tech |
+|-------|------|
+| Framework | React 18 |
+| Routing | React Router v6 |
+| HTTP Client | Axios |
+| Icons | Lucide React |
+| Toasts | React Hot Toast |
+| Styling | Custom CSS (no UI library) |
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🚀 Getting Started
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Prerequisites
+- Node.js 16+
+- npm or yarn
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Installation
 
-### `npm run eject`
+```bash
+git clone https://github.com/DukeeTheProgrammer/quicktopup-frontend.git
+cd quicktopup-frontend
+npm install
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Environment Setup
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Open `src/api/client.js` and update the base URL to point to your backend:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```js
+const BASE_URL = 'https://your-backend-url.com/api';
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Run Locally
 
-## Learn More
+```bash
+npm start
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+App runs at `http://localhost:3000`
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Production Build
 
-### Code Splitting
+```bash
+npm run build
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Built files go into the `/build` folder — ready to deploy.
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## 📁 Project Structure
 
-### Making a Progressive Web App
+```
+src/
+├── api/              # Axios API clients (auth, wallet, transactions, services)
+├── components/       # Shared components (Layout, Sidebar, Topbar)
+├── context/          # AuthContext (user session management)
+└── pages/
+    ├── auth/         # Login, Register, ForgotPassword, ResetPassword
+    ├── dashboard/    # Main dashboard
+    ├── services/     # Airtime, Data, Cable TV, Electricity + PIN Modal
+    ├── wallet/       # Wallet balance, fund modal, ledger
+    ├── transactions/ # Transaction history with filters
+    ├── notifications/# Notification center
+    └── profile/      # Profile & security settings
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+## 🔌 API Integration
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+This frontend connects to the **QuickTopUp.ng Django REST API**.
 
-### Deployment
+| Endpoint Group | Base Path |
+|---------------|-----------|
+| Auth | `/api/auth/` |
+| Wallet | `/api/wallet/` |
+| Transactions | `/api/transactions/` |
+| Services | `/api/services/` |
+| Notifications | `/api/notifications/` |
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+All requests use **Token-based authentication** — the token is stored in `localStorage` after login.
 
-### `npm run build` fails to minify
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 🚢 Deployment
+
+### Nginx
+
+```nginx
+server {
+    listen 80;
+    server_name yourdomain.com;
+    root /var/www/quicktopup/build;
+    index index.html;
+
+    location / {
+        try_files $uri /index.html;
+    }
+}
+```
+
+### Vercel / Netlify
+
+Just connect the GitHub repo — both platforms auto-detect React and configure the build command (`npm run build`) and publish directory (`build/`) automatically.
+
+---
+
+## 📞 Support
+
+- Email: quicktopup.it.com@gmail.com
+- Docs: https://docs.quicktopup.it.com
+- Status: https://status.quicktopup.it.com
+
+---
+
+## 📄 License
+
+MIT © 2026 QuickTopUp.ng
