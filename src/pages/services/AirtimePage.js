@@ -73,7 +73,7 @@ export default function AirtimePage() {
           <div className="amount-presets">
             {PRESETS.map(a => (
               <button key={a} type="button"
-                className={`preset-btn ${form.amount == a ? 'selected' : ''}`}
+                className={`preset-btn ${form.amount === String(a) ? 'selected' : ''}`}
                 onClick={() => setForm(p => ({ ...p, amount: String(a) }))}>
                 ₦{a.toLocaleString()}
               </button>

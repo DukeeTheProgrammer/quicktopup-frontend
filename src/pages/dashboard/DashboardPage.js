@@ -40,7 +40,7 @@ export default function DashboardPage() {
       } catch {} finally { setLoading(false); }
     };
     load();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="dashboard">

@@ -135,8 +135,8 @@ export default function WalletPage() {
                   <div className="amount-presets" style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
                     {FUND_PRESETS.map(a => (
                       <button key={a} type="button"
-                        style={{ padding: '6px 12px', borderRadius: 20, border: `1.5px solid ${fundAmount == a ? 'var(--green)' : 'var(--gray-300)'}`,
-                          background: fundAmount == a ? 'var(--green-light)' : 'white', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}
+                        style={{ padding: '6px 12px', borderRadius: 20, border: `1.5px solid ${fundAmount === String(a) ? 'var(--green)' : 'var(--gray-300)'}`,
+                          background: fundAmount === String(a) ? 'var(--green-light)' : 'white', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}
                         onClick={() => setFundAmount(String(a))}>
                         ₦{a.toLocaleString()}
                       </button>

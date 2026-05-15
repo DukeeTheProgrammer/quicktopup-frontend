@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { getProfile } from '../api/auth';
 
 const AuthContext = createContext(null);
@@ -8,7 +8,6 @@ export const AuthProvider = ({ children }) => {
     try { return JSON.parse(localStorage.getItem('user')); } catch { return null; }
   });
   const [token, setToken] = useState(() => localStorage.getItem('auth_token'));
-  const [loading, setLoading] = useState(false);
 
   const loginUser = (userData, authToken) => {
     setUser(userData);
@@ -34,7 +33,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loginUser, logoutUser, refreshUser, loading }}>
+    <AuthContext.Provider value={{ user, token, loginUser, logoutUser, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

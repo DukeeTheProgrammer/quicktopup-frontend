@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getTransactions } from '../../api/transactions';
-import { ClipboardList, Search, Filter } from 'lucide-react';
+import { ClipboardList, Search } from 'lucide-react';
 
 const STATUS_MAP = { success: 'badge-success', failed: 'badge-danger', pending: 'badge-warning', processing: 'badge-info' };
 const SERVICE_ICONS = { airtime: '📱', data: '📶', cable: '📺', electricity: '⚡' };
@@ -20,7 +20,7 @@ export default function TransactionsPage() {
     } catch {} finally { setLoading(false); }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const applyFilters = () => { setPage(1); load(filters, 1); };
   const clearFilters = () => { const f = { status: '', service_type: '', date_from: '', date_to: '' }; setFilters(f); setPage(1); load(f, 1); };

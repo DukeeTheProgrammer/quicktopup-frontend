@@ -5,7 +5,7 @@ export default function PinModal({ onConfirm, onClose, loading }) {
   const [pin, setPin] = useState(['', '', '', '']);
   const refs = [useRef(), useRef(), useRef(), useRef()];
 
-  useEffect(() => { refs[0].current?.focus(); }, []);
+  useEffect(() => { refs[0].current?.focus(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (i, val) => {
     if (!/^\d?$/.test(val)) return;
