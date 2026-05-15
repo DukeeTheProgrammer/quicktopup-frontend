@@ -1,0 +1,78 @@
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import AuthLayout from './AuthLayout';
+import { register } from '../../api/auth';
+import { useAuth } from '../../context/AuthContext';
+import toast from 'react-hot-toast';
+import { Eye, EyeOff } from 'lucide-react';
+
+export default function RegisterPage() {
+  const { loginUser } = useAuth();
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ email: '', phone: '', first_name: '', last_name: '', password: '', password_confirm: '' });
+  const [showPw, setShowPw] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const set = (key) => (e) => setForm(p => ({ ...p, [key]: e.target.value }));
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (form.password !== form.password_confirm) { toast.error('Passwords do not match'); return; }
+    setLoading(true);
+    try {
+      const res = await register(form);
+      const { user, token } = res.data.data;
+      loginUser(user, token);
+      toast.success('Account created! Welcome 🎉');
+      navigate('/dashboard');
+    } catch (err) {
+      const msg = err.response?.data?.error?.message || err.response?.data?.message || JSON.stringify(err.response?.data) || 'Registration failed';
+      toast.error(msg);
+    } finally { setLoading(false); }
+  };
+
+  return (
+    <AuthLayout title="Create account" subtitle="Join QuickTopUp.ng and enjoy fast VTU services">
+      <form onSubmit={handleSubmit}>
+        <div className="grid-2" style={{ gap: 12, marginBottom: 18 }}>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label className="form-label">First Name</label>
+            <input className="form-input" placeholder="John" value={form.first_name} onChange={set('first_name')} required />
+          </div>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label className="form-label">Last Name</label>
+            <input className="form-input" placeholder="Doe" value={form.last_name} onChange={set('last_name')} required />
+          </div>
+        </div>
+        <div className="form-group">
+          <label className="form-label">Email Address</label>
+          <input className="form-input" type="email" placeholder="you@example.com" value={form.email} onChange={set('email')} required />
+        </div>
+        <div className="form-group">
+          <label className="form-label">Phone Number</label>
+          <input className="form-input" type="tel" placeholder="+2348012345678" value={form.phone} onChange={set('phone')} required />
+        </div>
+        <div className="form-group">
+          <label className="form-label">Password</label>
+          <div className="password-wrapper">
+            <input className="form-input" type={showPw ? 'text' : 'password'} placeholder="Min. 8 characters"
+              style={{ paddingRight: 44 }} value={form.password} onChange={set('password')} required />
+            <button type="button" className="password-toggle" onClick={() => setShowPw(p => !p)}>
+              {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+        </div>
+        <div className="form-group">
+          <label className="form-label">Confirm Password</label>
+          <input className="form-input" type="password" placeholder="Repeat password" value={form.password_confirm} onChange={set('password_confirm')} required />
+        </div>
+        <button className="btn btn-primary btn-full btn-lg" type="submit" disabled={loading}>
+          {loading ? <span className="spinner" /> : 'Create Account'}
+        </button>
+      </form>
+      <div className="auth-footer">
+        Already have an account? <Link to="/login">Sign in</Link>
+      </div>
+    </AuthLayout>
+  );
+}
