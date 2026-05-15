@@ -1,12 +1,19 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://unmade-backboned-agreeably.ngrok-free.dev/api';
+// In production (Vercel), use the /api proxy to avoid CORS.
+// In development, hit the ngrok URL directly.
+const BASE_URL =
+  process.env.NODE_ENV === 'production'
+    ? '/api'
+    : 'https://unmade-backboned-agreeably.ngrok-free.dev/api';
 
 const client = axios.create({
   baseURL: BASE_URL,
+  withCredentials: false,
   headers: {
     'Content-Type': 'application/json',
     'ngrok-skip-browser-warning': 'true',
+    'Accept': 'application/json',
   },
 });
 

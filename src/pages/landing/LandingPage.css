@@ -1,0 +1,168 @@
+/* ===================== RESET & BASE ===================== */
+.lp { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a202c; overflow-x: hidden; }
+.lp *, .lp *::before, .lp *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ===================== NAV ===================== */
+.lp-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 5%; height: 68px;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+  border-bottom: 1px solid #e2e8f0;
+}
+.lp-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.lp-logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg,#00b96b,#00875a); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+.lp-logo-icon svg { color: #fff; }
+.lp-logo-text { font-size: 1.2rem; font-weight: 800; color: #1a202c; }
+.lp-logo-text span { color: #00b96b; }
+.lp-nav-links { display: flex; align-items: center; gap: 32px; }
+.lp-nav-links a { text-decoration: none; color: #4a5568; font-size: 0.92rem; font-weight: 500; transition: color .2s; }
+.lp-nav-links a:hover { color: #00b96b; }
+.lp-nav-cta { display: flex; gap: 12px; }
+.btn-outline { padding: 8px 20px; border: 2px solid #00b96b; color: #00b96b; border-radius: 8px; font-weight: 600; font-size: 0.88rem; text-decoration: none; transition: all .2s; }
+.btn-outline:hover { background: #00b96b; color: #fff; }
+.btn-solid { padding: 8px 20px; background: #00b96b; color: #fff; border-radius: 8px; font-weight: 600; font-size: 0.88rem; text-decoration: none; transition: all .2s; }
+.btn-solid:hover { background: #00875a; }
+
+/* ===================== HERO ===================== */
+.lp-hero {
+  min-height: 100vh; padding-top: 68px;
+  background: linear-gradient(135deg, #f0fff8 0%, #e8f5e9 40%, #fff 100%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding-left: 5%; padding-right: 5%;
+  position: relative; overflow: hidden;
+}
+.lp-hero::before {
+  content: ''; position: absolute; top: -200px; right: -200px;
+  width: 600px; height: 600px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,185,107,0.08) 0%, transparent 70%);
+}
+.lp-hero-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #e6f9f0; color: #00875a; padding: 6px 16px;
+  border-radius: 20px; font-size: 0.82rem; font-weight: 600;
+  margin-bottom: 24px; border: 1px solid #b2f5d8;
+}
+.lp-hero-badge span { width: 7px; height: 7px; background: #00b96b; border-radius: 50%; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.5; transform:scale(1.3); } }
+.lp-hero h1 { font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 900; line-height: 1.15; max-width: 780px; margin-bottom: 20px; }
+.lp-hero h1 em { font-style: normal; color: #00b96b; }
+.lp-hero p { font-size: clamp(1rem, 2vw, 1.2rem); color: #4a5568; max-width: 600px; line-height: 1.7; margin-bottom: 36px; }
+.lp-hero-actions { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-bottom: 60px; }
+.btn-hero-primary { padding: 14px 32px; background: #00b96b; color: #fff; border-radius: 12px; font-weight: 700; font-size: 1rem; text-decoration: none; transition: all .2s; box-shadow: 0 4px 20px rgba(0,185,107,.35); }
+.btn-hero-primary:hover { background: #00875a; transform: translateY(-2px); }
+.btn-hero-secondary { padding: 14px 32px; background: #fff; color: #1a202c; border-radius: 12px; font-weight: 700; font-size: 1rem; text-decoration: none; border: 2px solid #e2e8f0; transition: all .2s; }
+.btn-hero-secondary:hover { border-color: #00b96b; color: #00b96b; }
+.lp-hero-stats { display: flex; gap: 48px; flex-wrap: wrap; justify-content: center; }
+.lp-stat { text-align: center; }
+.lp-stat-num { font-size: 2rem; font-weight: 900; color: #00b96b; display: block; }
+.lp-stat-label { font-size: 0.82rem; color: #718096; font-weight: 500; }
+
+/* ===================== SECTION BASE ===================== */
+.lp-section { padding: 96px 5%; }
+.lp-section-alt { background: #f7fafc; }
+.lp-section-dark { background: #0f172a; color: #fff; }
+.section-tag { display: inline-block; background: #e6f9f0; color: #00875a; padding: 4px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; margin-bottom: 14px; }
+.section-tag-dark { background: rgba(0,185,107,.15); color: #4ade80; }
+.section-title { font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 900; line-height: 1.2; margin-bottom: 16px; }
+.section-sub { font-size: 1.05rem; color: #718096; max-width: 580px; line-height: 1.7; }
+.section-sub-white { color: #94a3b8; }
+.section-header { max-width: 680px; margin: 0 auto 56px; text-align: center; }
+
+/* ===================== SERVICES ===================== */
+.lp-services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; max-width: 1100px; margin: 0 auto; }
+.lp-service-card {
+  background: #fff; border-radius: 20px; padding: 32px 28px;
+  border: 1px solid #e2e8f0; transition: all .25s;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.lp-service-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,.1); border-color: #00b96b; }
+.lp-service-icon { width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; }
+.lp-service-card h3 { font-size: 1.15rem; font-weight: 800; }
+.lp-service-card p { font-size: 0.9rem; color: #718096; line-height: 1.65; }
+.lp-service-card ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.lp-service-card ul li { font-size: 0.85rem; color: #4a5568; display: flex; align-items: center; gap: 8px; }
+.lp-service-card ul li::before { content: '✓'; color: #00b96b; font-weight: 700; }
+.lp-service-link { font-size: 0.85rem; font-weight: 700; color: #00b96b; text-decoration: none; margin-top: auto; }
+.lp-service-link:hover { text-decoration: underline; }
+
+/* ===================== HOW IT WORKS ===================== */
+.lp-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 32px; max-width: 1000px; margin: 0 auto; position: relative; }
+.lp-step { text-align: center; position: relative; }
+.lp-step-num { width: 56px; height: 56px; background: linear-gradient(135deg,#00b96b,#00875a); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 900; margin: 0 auto 20px; box-shadow: 0 4px 16px rgba(0,185,107,.3); }
+.lp-step h3 { font-size: 1rem; font-weight: 800; margin-bottom: 8px; }
+.lp-step p { font-size: 0.88rem; color: #718096; line-height: 1.65; }
+
+/* ===================== NETWORKS ===================== */
+.lp-networks { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; max-width: 800px; margin: 0 auto; }
+.lp-network-badge {
+  display: flex; align-items: center; gap: 12px; padding: 14px 24px;
+  background: #fff; border: 1px solid #e2e8f0; border-radius: 50px;
+  font-weight: 700; font-size: 0.95rem; box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+.lp-network-dot { width: 12px; height: 12px; border-radius: 50%; }
+
+/* ===================== SECURITY ===================== */
+.lp-security-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; max-width: 1000px; margin: 0 auto; }
+.lp-security-card { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 16px; padding: 28px 24px; }
+.lp-security-card h3 { font-size: 1rem; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+.lp-security-card p { font-size: 0.88rem; color: #94a3b8; line-height: 1.65; }
+.sec-icon { font-size: 1.4rem; }
+
+/* ===================== PRICING ===================== */
+.lp-pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; max-width: 900px; margin: 0 auto; }
+.lp-price-card { background: #fff; border: 2px solid #e2e8f0; border-radius: 20px; padding: 36px 28px; text-align: center; transition: all .25s; }
+.lp-price-card.featured { border-color: #00b96b; box-shadow: 0 8px 32px rgba(0,185,107,.2); transform: scale(1.03); }
+.lp-price-badge { display: inline-block; background: #00b96b; color: #fff; padding: 3px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; margin-bottom: 12px; }
+.lp-price-card h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 8px; }
+.lp-price-amount { font-size: 2.8rem; font-weight: 900; color: #00b96b; margin: 12px 0 4px; }
+.lp-price-amount span { font-size: 1rem; color: #718096; font-weight: 500; }
+.lp-price-desc { font-size: 0.85rem; color: #718096; margin-bottom: 24px; }
+.lp-price-features { list-style: none; text-align: left; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+.lp-price-features li { font-size: 0.88rem; color: #4a5568; display: flex; align-items: center; gap: 8px; }
+.lp-price-features li::before { content: '✓'; color: #00b96b; font-weight: 700; flex-shrink: 0; }
+.btn-price { display: block; padding: 12px; background: #00b96b; color: #fff; border-radius: 10px; font-weight: 700; text-decoration: none; transition: all .2s; }
+.btn-price:hover { background: #00875a; }
+.btn-price-outline { background: transparent; border: 2px solid #00b96b; color: #00b96b; }
+.btn-price-outline:hover { background: #00b96b; color: #fff; }
+
+/* ===================== FAQ ===================== */
+.lp-faq { max-width: 740px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+.lp-faq-item { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden; }
+.lp-faq-q { padding: 20px 24px; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+.lp-faq-q::after { content: '+'; font-size: 1.3rem; color: #00b96b; font-weight: 300; }
+.lp-faq-a { padding: 0 24px 20px; font-size: 0.9rem; color: #718096; line-height: 1.7; }
+
+/* ===================== CTA BANNER ===================== */
+.lp-cta-banner {
+  background: linear-gradient(135deg, #00b96b, #00875a);
+  padding: 80px 5%; text-align: center; color: #fff;
+}
+.lp-cta-banner h2 { font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 900; margin-bottom: 16px; }
+.lp-cta-banner p { font-size: 1.05rem; opacity: .9; max-width: 520px; margin: 0 auto 36px; line-height: 1.7; }
+.btn-cta-white { display: inline-block; padding: 14px 36px; background: #fff; color: #00875a; border-radius: 12px; font-weight: 800; font-size: 1rem; text-decoration: none; transition: all .2s; }
+.btn-cta-white:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.2); }
+
+/* ===================== FOOTER ===================== */
+.lp-footer { background: #0f172a; color: #94a3b8; padding: 64px 5% 32px; }
+.lp-footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 48px; }
+.lp-footer-brand p { font-size: 0.88rem; line-height: 1.7; margin-top: 12px; max-width: 280px; }
+.lp-footer-col h4 { color: #fff; font-size: 0.9rem; font-weight: 700; margin-bottom: 16px; }
+.lp-footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.lp-footer-col ul li a { color: #94a3b8; text-decoration: none; font-size: 0.88rem; transition: color .2s; }
+.lp-footer-col ul li a:hover { color: #00b96b; }
+.lp-footer-bottom { border-top: 1px solid #1e293b; padding-top: 24px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 0.82rem; }
+.lp-footer-bottom a { color: #94a3b8; text-decoration: none; }
+.lp-footer-bottom a:hover { color: #00b96b; }
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 768px) {
+  .lp-nav-links { display: none; }
+  .lp-hero-stats { gap: 28px; }
+  .lp-footer-top { grid-template-columns: 1fr 1fr; }
+  .lp-price-card.featured { transform: none; }
+}
+@media (max-width: 480px) {
+  .lp-footer-top { grid-template-columns: 1fr; }
+  .lp-hero-actions { flex-direction: column; align-items: center; }
+}
