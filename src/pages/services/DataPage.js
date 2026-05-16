@@ -7,21 +7,45 @@ import PinModal from './PinModal';
 import { Wifi } from 'lucide-react';
 import './ServicePage.css';
 
-const NET_COLORS = { MTN: '#f6ad55', AIRTEL: '#e53e3e', GLO: '#00b96b', '9MOBILE': '#38a169', ETISALAT: '#38a169' };
+const NET_COLORS = {
+  MTN: '#f6ad55', AIRTEL: '#e53e3e', GLO: '#00b96b',
+  '9MOBILE': '#38a169', ETISALAT: '#38a169',
+  VODAFONE: '#e53e3e', AIRTELTIGO: '#e53e3e',
+};
+
+const COUNTRIES = [
+  { code: 'NG', label: '🇳🇬 Nigeria', currency: '₦', placeholder: '+2348012345678' },
+  { code: 'GH', label: '🇬🇭 Ghana', currency: 'GH₵', placeholder: '+233241234567' },
+];
 
 export default function DataPage() {
   const { user, refreshUser } = useAuth();
   const [networks, setNetworks] = useState([]);
   const [plans, setPlans] = useState([]);
+  const [country, setCountry] = useState('NG');
   const [form, setForm] = useState({ phone: '', network: '', plan_id: null });
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [loading, setLoading] = useState(false);
   const [plansLoading, setPlansLoading] = useState(false);
   const [showPin, setShowPin] = useState(false);
 
+  const selectedCountry = COUNTRIES.find(c => c.code === country);
+
   useEffect(() => {
     getNetworks().then(r => setNetworks(r.data.data || [])).catch(() => {});
   }, []);
+
+  const handlePhoneChange = (e) => {
+    const val = e.target.value;
+    setForm(p => ({ ...p, phone: val }));
+    if (val.startsWith('+233') || val.startsWith('233')) setCountry('GH');
+    else if (val.startsWith('+234') || val.startsWith('234')) setCountry('NG');
+  };
+
+  const filteredNetworks = networks.filter(n => {
+    if (country === 'GH') return ['MTN', 'VODAFONE', 'AIRTELTIGO'].includes(n.code);
+    return !['VODAFONE', 'AIRTELTIGO'].includes(n.code);
+  });
 
   const selectNetwork = async (code) => {
     setForm(p => ({ ...p, network: code, plan_id: null }));
@@ -30,7 +54,7 @@ export default function DataPage() {
     try {
       const r = await getDataPlans(code);
       setPlans(r.data.data || []);
-    } catch {} finally { setPlansLoading(false); }
+    } catch { setPlans([]); } finally { setPlansLoading(false); }
   };
 
   const handleBuy = () => {
@@ -41,7 +65,13 @@ export default function DataPage() {
   const confirmPurchase = async (pin) => {
     setLoading(true);
     try {
-      await purchaseData({ phone: form.phone, network: form.network, plan_id: form.plan_id, pin });
+      await purchaseData({
+        phone: form.phone,
+        network: form.network,
+        plan_id: form.plan_id,
+        pin,
+        country: country === 'GH' ? 'ghana' : 'nigeria',
+      });
       toast.success(`Data bundle sent to ${form.phone} ✓`);
       setForm(p => ({ ...p, plan_id: null }));
       setSelectedPlan(null);
@@ -56,17 +86,33 @@ export default function DataPage() {
   return (
     <div className="service-page">
       <div className="page-title">Buy Data Bundle</div>
-      <div className="page-subtitle">Get internet data for any network</div>
+      <div className="page-subtitle">Get internet data for any Nigerian or Ghanaian network</div>
 
       <div className="service-form-card">
+
+        {/* Country */}
+        <div className="form-group">
+          <label className="form-label">Country</label>
+          <div style={{ display: 'flex', gap: 10 }}>
+            {COUNTRIES.map(c => (
+              <button key={c.code} type="button"
+                className={`cable-provider-btn ${country === c.code ? 'selected' : ''}`}
+                onClick={() => { setCountry(c.code); setForm({ phone: '', network: '', plan_id: null }); setPlans([]); setSelectedPlan(null); }}>
+                {c.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Network */}
         <div className="form-group">
           <label className="form-label">Select Network</label>
           <div className="network-grid">
-            {networks.map(net => (
+            {(filteredNetworks.length > 0 ? filteredNetworks : networks).map(net => (
               <button key={net.id} type="button"
                 className={`network-btn ${form.network === net.code ? 'selected' : ''}`}
                 onClick={() => selectNetwork(net.code)}>
-                <div className="net-icon" style={{ background: NET_COLORS[net.code] || '#ccc', color: 'white' }}>
+                <div className="net-icon" style={{ background: NET_COLORS[net.code] || '#718096', color: 'white' }}>
                   {net.code?.slice(0, 3)}
                 </div>
                 {net.name?.split(' ')[0]}
@@ -75,18 +121,25 @@ export default function DataPage() {
           </div>
         </div>
 
+        {/* Phone */}
         <div className="form-group">
           <label className="form-label">Phone Number</label>
-          <input className="form-input" type="tel" placeholder="+2348012345678"
-            value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} />
+          <input className="form-input" type="tel"
+            placeholder={selectedCountry.placeholder}
+            value={form.phone} onChange={handlePhoneChange} />
         </div>
 
+        {/* Plans */}
         {form.network && (
           <div className="form-group">
             <label className="form-label">Select Data Plan</label>
             {plansLoading ? (
               <div style={{ textAlign: 'center', padding: 20 }}>
                 <div className="spinner spinner-dark" style={{ margin: '0 auto' }} />
+              </div>
+            ) : plans.filter(p => p.is_active).length === 0 ? (
+              <div style={{ padding: '16px', background: 'var(--gray-100)', borderRadius: 10, fontSize: 14, color: 'var(--gray-500)', textAlign: 'center' }}>
+                No plans found for {form.network}. Try selecting another network.
               </div>
             ) : (
               <div className="plan-grid">
@@ -96,7 +149,7 @@ export default function DataPage() {
                     onClick={() => { setForm(p => ({ ...p, plan_id: plan.id })); setSelectedPlan(plan); }}>
                     <div className="plan-name">{plan.name}</div>
                     <div className="plan-size">{plan.data_size}</div>
-                    <div className="plan-price">₦{parseFloat(plan.selling_price).toLocaleString()}</div>
+                    <div className="plan-price">{selectedCountry.currency}{parseFloat(plan.selling_price).toLocaleString()}</div>
                     <div className="plan-validity">{plan.validity_days} days</div>
                   </button>
                 ))}
@@ -107,10 +160,11 @@ export default function DataPage() {
 
         {selectedPlan && form.phone && (
           <div className="summary-box">
+            <div className="summary-row"><span>Country</span><span>{selectedCountry.label}</span></div>
             <div className="summary-row"><span>Plan</span><span>{selectedPlan.name}</span></div>
             <div className="summary-row"><span>Data</span><span>{selectedPlan.data_size} / {selectedPlan.validity_days} days</span></div>
             <div className="summary-row"><span>Phone</span><span>{form.phone}</span></div>
-            <div className="summary-row"><span>Total</span><span>₦{parseFloat(selectedPlan.selling_price).toLocaleString()}</span></div>
+            <div className="summary-row"><span>Total</span><span><strong>{selectedCountry.currency}{parseFloat(selectedPlan.selling_price).toLocaleString()}</strong></span></div>
           </div>
         )}
 

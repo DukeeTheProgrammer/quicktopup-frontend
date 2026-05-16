@@ -1,11 +1,8 @@
 import axios from 'axios';
 
-// In production (Vercel), use the /api proxy to avoid CORS.
-// In development, hit the ngrok URL directly.
-const BASE_URL =
-  process.env.NODE_ENV === 'production'
-    ? '/api'
-    : 'https://unmade-backboned-agreeably.ngrok-free.dev/api';
+// Always hit the backend directly. The ngrok-skip-browser-warning header
+// disables the ngrok interstitial page. CORS is handled by the Django backend.
+const BASE_URL = 'https://unmade-backboned-agreeably.ngrok-free.dev/api';
 
 const client = axios.create({
   baseURL: BASE_URL,
@@ -20,8 +17,10 @@ const client = axios.create({
 client.interceptors.request.use((config) => {
   const token = localStorage.getItem('auth_token');
   if (token) {
-    config.headers.Authorization = `Token ${token}`;
+    config.headers['Authorization'] = `Token ${token}`;
   }
+  // Always include ngrok bypass on every request
+  config.headers['ngrok-skip-browser-warning'] = 'true';
   return config;
 });
 

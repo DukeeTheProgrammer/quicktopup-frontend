@@ -8,7 +8,7 @@ const SERVICES = [
   {
     icon: '📱', color: '#e6f9f0', iconColor: '#00b96b',
     title: 'Airtime Top-Up',
-    desc: 'Instantly recharge any Nigerian mobile number across all networks. No delays, no downtime.',
+    desc: 'Instantly recharge any Nigerian or Ghanaian mobile number. Powered by VTU.ng, VTPass & Hubtel. No delays, no downtime.',
     features: [
       'Supports MTN, Airtel, Glo & 9Mobile',
       'Minimum ₦50, maximum ₦50,000 per transaction',
@@ -56,10 +56,13 @@ const SERVICES = [
 ];
 
 const NETWORKS = [
-  { name: 'MTN Nigeria', color: '#f6d800' },
-  { name: 'Airtel Nigeria', color: '#e4002b' },
-  { name: 'Glo Mobile', color: '#00b140' },
-  { name: '9Mobile', color: '#006b3f' },
+  { name: 'MTN Nigeria', color: '#f6d800', flag: '🇳🇬' },
+  { name: 'Airtel Nigeria', color: '#e4002b', flag: '🇳🇬' },
+  { name: 'Glo Mobile', color: '#00b140', flag: '🇳🇬' },
+  { name: '9Mobile', color: '#006b3f', flag: '🇳🇬' },
+  { name: 'MTN Ghana', color: '#f6d800', flag: '🇬🇭' },
+  { name: 'Vodafone Ghana', color: '#e4002b', flag: '🇬🇭' },
+  { name: 'AirtelTigo Ghana', color: '#e07b39', flag: '🇬🇭' },
 ];
 
 const STEPS = [
@@ -85,6 +88,7 @@ const FAQS = [
   { q: 'Is my money safe in the wallet?', a: 'Yes. Wallet funds are held securely with daily and monthly spending limits. Your wallet can also be locked if suspicious activity is detected.' },
   { q: 'Which electricity DISCOs are supported?', a: 'All major DISCOs are supported including EKEDC (Eko), IKEDC (Ikeja), AEDC (Abuja), PHED (Port Harcourt), EEDC (Enugu), KEDCO, IBEDC, BEDC, JED, KAEDC, and YEDC.' },
   { q: 'Can I use QuickTopUp for my business?', a: 'Absolutely. Many resellers and small businesses use QuickTopUp. The wallet system with high daily limits and full transaction history makes it ideal for business use.' },
+  { q: 'Does QuickTopUp support Ghana?', a: 'Yes! Ghana is fully supported via the Hubtel integration. You can buy airtime and data for MTN Ghana, Vodafone Ghana, and AirtelTigo. Phone numbers starting with +233 are automatically detected as Ghana.' },
 ];
 
 /* ─── Component ─── */
@@ -117,7 +121,7 @@ export default function LandingPage() {
         <div className="lp-hero-badge">
           <span></span> Live & Processing Transactions
         </div>
-        <h1>Nigeria's Fastest<br /><em>VTU Platform</em> for<br />Every Nigerian</h1>
+        <h1>Nigeria & Ghana's Fastest<br /><em>VTU Platform</em> for<br />Everyone</h1>
         <p>
           Buy airtime, data, cable TV subscriptions, and pay electricity bills in seconds — all from one secure wallet. No queues, no agents, no stress.
         </p>
@@ -135,8 +139,8 @@ export default function LandingPage() {
             <span className="lp-stat-label">Data Plans</span>
           </div>
           <div className="lp-stat">
-            <span className="lp-stat-num">11</span>
-            <span className="lp-stat-label">DISCOs Supported</span>
+            <span className="lp-stat-num">2</span>
+            <span className="lp-stat-label">Countries (NG & GH)</span>
           </div>
           <div className="lp-stat">
             <span className="lp-stat-num">&lt;5s</span>
@@ -153,14 +157,14 @@ export default function LandingPage() {
       <section className="lp-section lp-section-alt" id="networks">
         <div className="section-header">
           <span className="section-tag">Supported Networks</span>
-          <h2 className="section-title">All 4 Major Networks Covered</h2>
-          <p className="section-sub">Whether you're on MTN, Airtel, Glo, or 9Mobile — we've got you. Airtime and data for every Nigerian number.</p>
+          <h2 className="section-title">7 Networks Across Nigeria & Ghana</h2>
+          <p className="section-sub">Nigeria and Ghana covered. MTN, Airtel, Glo, 9Mobile, Vodafone Ghana, and AirtelTigo — all supported.</p>
         </div>
         <div className="lp-networks">
           {NETWORKS.map(n => (
             <div className="lp-network-badge" key={n.name}>
               <span className="lp-network-dot" style={{ background: n.color }}></span>
-              {n.name}
+              {n.flag} {n.name}
               <CheckCircle size={16} color="#00b96b" />
             </div>
           ))}
@@ -256,7 +260,7 @@ export default function LandingPage() {
         <div className="section-header">
           <span className="section-tag">Payment</span>
           <h2 className="section-title">Powered by Flutterwave</h2>
-          <p className="section-sub">QuickTopUp uses Flutterwave — Africa's leading payment infrastructure — to process all wallet funding. Your payment data never touches our servers.</p>
+          <p className="section-sub">QuickTopUp uses Flutterwave for payments and integrates with VTU.ng, VTPass, and Hubtel to deliver services across Nigeria and Ghana. Multiple redundant providers ensure maximum uptime.</p>
         </div>
         <div className="lp-services-grid" style={{ maxWidth: 860 }}>
           {[
@@ -293,7 +297,7 @@ export default function LandingPage() {
       {/* ── CTA BANNER ── */}
       <div className="lp-cta-banner">
         <h2>Ready to Never Visit a Recharge Card Seller Again?</h2>
-        <p>Join thousands of Nigerians who pay bills, buy data, and recharge airtime in seconds from their phone.</p>
+        <p>Join thousands of users across Nigeria and Ghana who pay bills, buy data, and recharge airtime in seconds.</p>
         <Link to="/register" className="btn-cta-white">Create Your Free Account →</Link>
       </div>
 
@@ -307,7 +311,7 @@ export default function LandingPage() {
               </div>
               <span className="lp-logo-text" style={{ color: '#fff' }}>Quick<span>TopUp</span>.ng</span>
             </Link>
-            <p>Nigeria's fastest VTU platform. Airtime, data, cable TV, and electricity bills — all in one wallet.</p>
+            <p>Fast VTU services for Nigeria and Ghana. Airtime, data, cable TV, and electricity — all in one wallet.</p>
           </div>
           <div className="lp-footer-col">
             <h4>Services</h4>
