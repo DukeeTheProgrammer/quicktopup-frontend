@@ -1,7 +1,5 @@
 import axios from 'axios';
 
-// Always hit the backend directly. The ngrok-skip-browser-warning header
-// disables the ngrok interstitial page. CORS is handled by the Django backend.
 const BASE_URL = 'https://unmade-backboned-agreeably.ngrok-free.dev/api';
 
 const client = axios.create({
@@ -9,8 +7,12 @@ const client = axios.create({
   withCredentials: false,
   headers: {
     'Content-Type': 'application/json',
-    'ngrok-skip-browser-warning': 'true',
     'Accept': 'application/json',
+    // NOTE: ngrok-skip-browser-warning is NOT sent here.
+    // It's not in the server's CORS_ALLOW_HEADERS, so including it causes
+    // the preflight to fail. The Django CORS config allows our Vercel origin
+    // directly, so we don't need it — ngrok only shows the interstitial for
+    // browser tab visits, not for programmatic API calls from an allowed origin.
   },
 });
 
@@ -19,8 +21,6 @@ client.interceptors.request.use((config) => {
   if (token) {
     config.headers['Authorization'] = `Token ${token}`;
   }
-  // Always include ngrok bypass on every request
-  config.headers['ngrok-skip-browser-warning'] = 'true';
   return config;
 });
 
