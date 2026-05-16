@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import AuthLayout from './AuthLayout';
 import { login } from '../../api/auth';
 import { useAuth } from '../../context/AuthContext';
@@ -8,7 +8,6 @@ import { Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const { loginUser } = useAuth();
-  const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', password: '' });
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -18,14 +17,39 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const res = await login(form);
-      const { user, token } = res.data.data;
+      // Handle both { data: { user, token } } and flat { user, token }
+      const payload = res.data?.data || res.data;
+      const user = payload?.user;
+      const token = payload?.token;
+
+      if (!token) {
+        toast.success(res.data?.message || 'Login successful! Please wait...');
+        window.location.href = '/dashboard';
+        return;
+      }
+
+      // Persist to localStorage FIRST, then update context, then navigate
+      localStorage.setItem('auth_token', token);
+      localStorage.setItem('user', JSON.stringify(user));
       loginUser(user, token);
-      toast.success('Welcome back! 🎉');
-      navigate('/dashboard');
+      toast.success(`Welcome back, ${user?.first_name || 'there'}! 👋`);
+      window.location.href = '/dashboard';
     } catch (err) {
-      const msg = err.response?.data?.error?.message || err.response?.data?.message || 'Login failed';
-      toast.error(msg);
-    } finally { setLoading(false); }
+      if (err.response) {
+        const d = err.response.data;
+        const msg = d?.error?.message || d?.message
+          || (typeof d === 'string' ? d : null)
+          || `Error ${err.response.status}`;
+        toast.error(msg);
+      } else if (err.request) {
+        toast.error('No response from server. Check your connection.');
+      } else {
+        console.error('Login runtime error:', err);
+        toast.error('Something went wrong. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -34,21 +58,24 @@ export default function LoginPage() {
         <div className="form-group">
           <label className="form-label">Email Address</label>
           <input className="form-input" type="email" placeholder="you@example.com"
-            value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} required />
+            value={form.email}
+            onChange={e => setForm(p => ({ ...p, email: e.target.value }))} required />
         </div>
         <div className="form-group">
           <label className="form-label">Password</label>
           <div className="password-wrapper">
-            <input className="form-input" type={showPw ? 'text' : 'password'} placeholder="Your password"
-              style={{ paddingRight: 44 }}
-              value={form.password} onChange={e => setForm(p => ({ ...p, password: e.target.value }))} required />
+            <input className="form-input" type={showPw ? 'text' : 'password'}
+              placeholder="Your password" style={{ paddingRight: 44 }}
+              value={form.password}
+              onChange={e => setForm(p => ({ ...p, password: e.target.value }))} required />
             <button type="button" className="password-toggle" onClick={() => setShowPw(p => !p)}>
               {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
         </div>
         <div style={{ textAlign: 'right', marginBottom: 20 }}>
-          <Link to="/forgot-password" style={{ fontSize: 13, color: 'var(--green)', textDecoration: 'none', fontWeight: 600 }}>
+          <Link to="/forgot-password"
+            style={{ fontSize: 13, color: 'var(--green)', textDecoration: 'none', fontWeight: 600 }}>
             Forgot password?
           </Link>
         </div>
