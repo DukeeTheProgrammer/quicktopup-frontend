@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Phone, Wifi, Tv, Zap, Shield, Lock, Clock, CreditCard, CheckCircle, Globe } from 'lucide-react';
+import { Zap, Shield, Lock, Clock, CreditCard, CheckCircle, Globe } from 'lucide-react';
 import './LandingPage.css';
 
 /* ─── Data ─── */
