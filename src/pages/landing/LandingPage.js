@@ -1,211 +1,293 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Zap, Shield, Lock, Clock, CreditCard, CheckCircle, Globe } from 'lucide-react';
+import { Zap, Shield, CheckCircle, Menu, X } from 'lucide-react';
 import './LandingPage.css';
 
 /* ─── Data ─── */
 const SERVICES = [
   {
-    icon: '📱', color: '#e6f9f0', iconColor: '#00b96b',
+    icon: '📱', gradient: 'linear-gradient(135deg,#00b96b,#00d97e)',
     title: 'Airtime Top-Up',
-    desc: 'Instantly recharge any Nigerian or Ghanaian mobile number. Powered by VTU.ng, VTPass & Hubtel. No delays, no downtime.',
-    features: [
-      'Supports MTN, Airtel, Glo & 9Mobile',
-      'Minimum ₦50, maximum ₦50,000 per transaction',
-      'Delivered within 5 seconds on average',
-      'Automated retry on failed attempts',
-    ],
+    desc: 'Recharge any Nigerian or Ghanaian number across all networks in under 5 seconds.',
+    badge: 'Most Popular',
     link: '/register',
   },
   {
-    icon: '📶', color: '#ebf8ff', iconColor: '#4299e1',
+    icon: '📶', gradient: 'linear-gradient(135deg,#4299e1,#63b3ed)',
     title: 'Data Bundles',
-    desc: 'Buy affordable data plans for all networks. Daily, weekly, and monthly plans available.',
-    features: [
-      'Over 50+ active data plans across 4 networks',
-      'Discounted selling prices vs retail',
-      'Plans from 100MB to 100GB+',
-      'Validity from 1 day to 30 days',
-    ],
+    desc: '50+ plans from 100MB to 100GB+ across all networks. Daily, weekly, and monthly.',
+    badge: '50+ Plans',
     link: '/register',
   },
   {
-    icon: '📺', color: '#faf5ff', iconColor: '#9f7aea',
-    title: 'Cable TV Subscriptions',
-    desc: 'Renew your DSTV, GOtv, Startimes or Showmax subscription instantly without leaving home.',
-    features: [
-      'DSTV, GOtv, Startimes, Showmax supported',
-      'Padi, Compact, Premium & all bouquets',
-      'Renew before or after expiry',
-      'IUC number validation before payment',
-    ],
+    icon: '📺', gradient: 'linear-gradient(135deg,#9f7aea,#b794f4)',
+    title: 'Cable TV',
+    desc: 'DSTV, GOtv, Startimes & Showmax — renew any bouquet instantly. IUC validated.',
+    badge: '4 Providers',
     link: '/register',
   },
   {
-    icon: '⚡', color: '#fffbeb', iconColor: '#f6ad55',
-    title: 'Electricity Bills',
-    desc: 'Pay electricity bills for all DISCOs in Nigeria. Prepaid and postpaid meters supported.',
-    features: [
-      'All 11 DISCOs supported (EKEDC, IKEDC, AEDC…)',
-      'Prepaid & postpaid meter types',
-      'Instant token generation for prepaid meters',
-      'Real-time bill validation',
-    ],
+    icon: '⚡', gradient: 'linear-gradient(135deg,#f6ad55,#fc8181)',
+    title: 'Electricity',
+    desc: 'All 11 Nigerian DISCOs supported. Prepaid tokens generated in real-time.',
+    badge: '11 DISCOs',
     link: '/register',
   },
 ];
 
 const NETWORKS = [
-  { name: 'MTN Nigeria', color: '#f6d800', flag: '🇳🇬' },
-  { name: 'Airtel Nigeria', color: '#e4002b', flag: '🇳🇬' },
-  { name: 'Glo Mobile', color: '#00b140', flag: '🇳🇬' },
-  { name: '9Mobile', color: '#006b3f', flag: '🇳🇬' },
-  { name: 'MTN Ghana', color: '#f6d800', flag: '🇬🇭' },
-  { name: 'Vodafone Ghana', color: '#e4002b', flag: '🇬🇭' },
-  { name: 'AirtelTigo Ghana', color: '#e07b39', flag: '🇬🇭' },
+  { name: 'MTN', full: 'MTN Nigeria', color: '#f6d800', flag: '🇳🇬' },
+  { name: 'Airtel', full: 'Airtel Nigeria', color: '#e4002b', flag: '🇳🇬' },
+  { name: 'Glo', full: 'Glo Mobile', color: '#00b140', flag: '🇳🇬' },
+  { name: '9Mobile', full: '9Mobile', color: '#006b3f', flag: '🇳🇬' },
+  { name: 'MTN GH', full: 'MTN Ghana', color: '#f6d800', flag: '🇬🇭' },
+  { name: 'Vodafone', full: 'Vodafone Ghana', color: '#e4002b', flag: '🇬🇭' },
+  { name: 'AirtelTigo', full: 'AirtelTigo Ghana', color: '#e07b39', flag: '🇬🇭' },
 ];
 
 const STEPS = [
-  { num: '1', title: 'Create Your Account', desc: 'Sign up with your email and phone number in under 60 seconds. No paperwork, no verification delays.' },
-  { num: '2', title: 'Fund Your Wallet', desc: 'Add money to your QuickTopUp wallet via bank transfer. Your balance is instantly available.' },
-  { num: '3', title: 'Pick a Service', desc: 'Choose from Airtime, Data, Cable TV, or Electricity. Enter the details and set your 4-digit PIN.' },
-  { num: '4', title: 'Done in Seconds', desc: 'Your transaction is processed instantly. A receipt and notification land in your inbox right away.' },
+  { num: '01', icon: '✍️', title: 'Create Account', desc: 'Sign up in 60 seconds — email and phone, that\'s it.' },
+  { num: '02', icon: '💳', title: 'Fund Wallet', desc: 'Bank transfer or card. Balance available instantly.' },
+  { num: '03', icon: '🛒', title: 'Pick a Service', desc: 'Airtime, data, cable, or electricity. Enter details + PIN.' },
+  { num: '04', icon: '🚀', title: 'Done!', desc: 'Transaction processed. Receipt in your inbox.' },
 ];
 
 const SECURITY = [
-  { icon: '🔒', title: '4-Digit Transaction PIN', desc: 'Every purchase requires your personal 4-digit PIN. Even if someone has your password, they cannot make transactions.' },
-  { icon: '🛡️', title: 'Token Authentication', desc: 'All API sessions are secured with rotating Bearer tokens. Tokens are invalidated immediately on logout.' },
-  { icon: '⚡', title: 'Idempotency Protection', desc: 'Unique idempotency keys on every request prevent duplicate charges — even if you tap "Buy" twice.' },
-  { icon: '📊', title: 'Spending Limits', desc: 'Configurable daily (₦50,000) and monthly (₦200,000) wallet limits protect you from unauthorized large transactions.' },
-  { icon: '🔍', title: 'Input Validation', desc: 'Every request is validated server-side — phone format, amount range, required fields — before any charge is attempted.' },
-  { icon: '🔔', title: 'Real-Time Notifications', desc: 'Instant email and in-app notifications for every transaction. You always know what\'s happening in your account.' },
+  { icon: '🔒', title: '4-Digit PIN', desc: 'Every purchase needs your PIN. Password alone can\'t authorise transactions.' },
+  { icon: '🛡️', title: 'Token Auth', desc: 'Bearer tokens on all sessions. Invalidated instantly on logout.' },
+  { icon: '⚡', title: 'Idempotency', desc: 'Unique keys per request — tap "Buy" twice, charged once.' },
+  { icon: '📊', title: 'Spend Limits', desc: '₦50k daily / ₦200k monthly caps protect against unauthorised use.' },
+  { icon: '🔍', title: 'Validation', desc: 'Phone format, amount range, required fields — all checked server-side.' },
+  { icon: '🔔', title: 'Alerts', desc: 'Instant email + in-app notification on every transaction.' },
 ];
 
 const FAQS = [
-  { q: 'How fast is airtime delivery?', a: 'Airtime is delivered within 5 seconds on average. Our API connects directly to VTU providers with automated retry logic for any failed attempts.' },
-  { q: 'What happens if my transaction fails?', a: 'If a transaction fails, your wallet balance is not deducted. You receive a failed status notification and a full refund is automatic. You can retry immediately.' },
-  { q: 'How do I fund my wallet?', a: 'Go to the Wallet page, click "Fund Wallet", enter an amount, and you\'ll receive our bank account details for a direct transfer. Your balance updates as soon as the transfer is confirmed.' },
-  { q: 'Is my money safe in the wallet?', a: 'Yes. Wallet funds are held securely with daily and monthly spending limits. Your wallet can also be locked if suspicious activity is detected.' },
-  { q: 'Which electricity DISCOs are supported?', a: 'All major DISCOs are supported including EKEDC (Eko), IKEDC (Ikeja), AEDC (Abuja), PHED (Port Harcourt), EEDC (Enugu), KEDCO, IBEDC, BEDC, JED, KAEDC, and YEDC.' },
-  { q: 'Can I use QuickTopUp for my business?', a: 'Absolutely. Many resellers and small businesses use QuickTopUp. The wallet system with high daily limits and full transaction history makes it ideal for business use.' },
-  { q: 'Does QuickTopUp support Ghana?', a: 'Yes! Ghana is fully supported via the Hubtel integration. You can buy airtime and data for MTN Ghana, Vodafone Ghana, and AirtelTigo. Phone numbers starting with +233 are automatically detected as Ghana.' },
+  { q: 'How fast is airtime delivery?', a: 'Under 5 seconds on average. Direct API connection to VTU providers with automatic retry on failure.' },
+  { q: 'What if my transaction fails?', a: 'Your wallet is not debited on failure. You get a notification and can retry immediately.' },
+  { q: 'How do I fund my wallet?', a: 'Wallet page → Fund Wallet → enter amount → receive our bank details for direct transfer. Updates instantly.' },
+  { q: 'Which electricity DISCOs are supported?', a: 'All 11: EKEDC, IKEDC, AEDC, PHED, EEDC, KEDCO, IBEDC, BEDC, JED, KAEDC, and YEDC.' },
+  { q: 'Does QuickTopUp support Ghana?', a: 'Yes! MTN Ghana, Vodafone, and AirtelTigo via Hubtel. Numbers starting with +233 auto-detected.' },
+  { q: 'Can I use this for my business?', a: 'Absolutely — high limits, full transaction history, and wallet management make it ideal for resellers.' },
 ];
+
+const STATS = [
+  { num: '4', label: 'Services' },
+  { num: '<5s', label: 'Avg. Delivery' },
+  { num: '2', label: 'Countries' },
+  { num: '24/7', label: 'Always Online' },
+];
+
+/* ─── Hooks ─── */
+function useInView(threshold = 0.15) {
+  const ref = useRef(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setInView(true); obs.disconnect(); } }, { threshold });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, [threshold]);
+  return [ref, inView];
+}
+
+/* ─── FAQ Item ─── */
+function FaqItem({ q, a, i }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={`lp-faq-item ${open ? 'open' : ''}`} style={{ '--i': i }}>
+      <button className="lp-faq-q" onClick={() => setOpen(p => !p)}>
+        {q}
+        <span className="faq-chevron">{open ? '−' : '+'}</span>
+      </button>
+      <div className="lp-faq-a-wrap" style={{ maxHeight: open ? 200 : 0 }}>
+        <div className="lp-faq-a">{a}</div>
+      </div>
+    </div>
+  );
+}
 
 /* ─── Component ─── */
 export default function LandingPage() {
+  const [navOpen, setNavOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  const [heroRef, heroIn] = useInView(0.1);
+  const [statsRef, statsIn] = useInView(0.2);
+  const [svcRef, svcIn] = useInView(0.1);
+  const [netRef, netIn] = useInView(0.15);
+  const [stepsRef, stepsIn] = useInView(0.1);
+  const [secRef, secIn] = useInView(0.1);
+  const [faqRef, faqIn] = useInView(0.1);
+  const [ctaRef, ctaIn] = useInView(0.2);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
     <div className="lp">
 
       {/* ── NAV ── */}
-      <nav className="lp-nav">
-        <Link to="/" className="lp-logo">
-          <div className="lp-logo-icon">
-            <Zap size={18} />
-          </div>
+      <nav className={`lp-nav ${scrolled ? 'lp-nav-scrolled' : ''}`}>
+        <Link to="/" className="lp-logo" onClick={() => setNavOpen(false)}>
+          <div className="lp-logo-icon"><Zap size={18} /></div>
           <span className="lp-logo-text">Quick<span>TopUp</span>.ng</span>
         </Link>
-        <div className="lp-nav-links">
-          <a href="#services">Services</a>
-          <a href="#how-it-works">How It Works</a>
-          <a href="#security">Security</a>
-          <a href="#faq">FAQ</a>
+        <div className={`lp-nav-links ${navOpen ? 'open' : ''}`}>
+          <a href="#services" onClick={() => setNavOpen(false)}>Services</a>
+          <a href="#how-it-works" onClick={() => setNavOpen(false)}>How It Works</a>
+          <a href="#security" onClick={() => setNavOpen(false)}>Security</a>
+          <a href="#faq" onClick={() => setNavOpen(false)}>FAQ</a>
+          <div className="lp-nav-cta-mobile">
+            <Link to="/login" className="btn-outline" onClick={() => setNavOpen(false)}>Log In</Link>
+            <Link to="/register" className="btn-solid" onClick={() => setNavOpen(false)}>Get Started</Link>
+          </div>
         </div>
-        <div className="lp-nav-cta">
+        <div className="lp-nav-cta lp-nav-cta-desktop">
           <Link to="/login" className="btn-outline">Log In</Link>
           <Link to="/register" className="btn-solid">Get Started</Link>
         </div>
+        <button className="lp-hamburger" onClick={() => setNavOpen(p => !p)} aria-label="Menu">
+          {navOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
       </nav>
+      {navOpen && <div className="lp-nav-overlay" onClick={() => setNavOpen(false)} />}
 
       {/* ── HERO ── */}
-      <section className="lp-hero">
-        <div className="lp-hero-badge">
-          <span></span> Live & Processing Transactions
+      <section className="lp-hero" ref={heroRef}>
+        <div className="hero-bg-blob blob-1" />
+        <div className="hero-bg-blob blob-2" />
+        <div className="hero-bg-blob blob-3" />
+
+        <div className={`lp-hero-inner ${heroIn ? 'fade-up-in' : 'fade-up-out'}`}>
+          <div className="lp-hero-badge">
+            <span className="pulse-dot" /> Live & Processing Transactions
+          </div>
+          <h1>
+            Nigeria <span className="amp">&amp;</span> Ghana's<br />
+            <em>Fastest VTU</em><br />Platform
+          </h1>
+          <p>
+            Airtime, data, cable TV, and electricity — all from one secure wallet.
+            No queues, no agents, under 5 seconds.
+          </p>
+          <div className="lp-hero-actions">
+            <Link to="/register" className="btn-hero-primary">
+              Create Free Account <span className="btn-arrow">→</span>
+            </Link>
+            <Link to="/login" className="btn-hero-secondary">Sign In</Link>
+          </div>
         </div>
-        <h1>Nigeria & Ghana's Fastest<br /><em>VTU Platform</em> for<br />Everyone</h1>
-        <p>
-          Buy airtime, data, cable TV subscriptions, and pay electricity bills in seconds — all from one secure wallet. No queues, no agents, no stress.
-        </p>
-        <div className="lp-hero-actions">
-          <Link to="/register" className="btn-hero-primary">Create Free Account →</Link>
-          <Link to="/login" className="btn-hero-secondary">I Already Have an Account</Link>
+
+        {/* ── Stats strip ── */}
+        <div className={`lp-hero-stats ${statsIn ? 'fade-up-in' : 'fade-up-out'}`} ref={statsRef}>
+          {STATS.map((s, i) => (
+            <div className="lp-stat" key={s.label} style={{ '--i': i }}>
+              <span className="lp-stat-num">{s.num}</span>
+              <span className="lp-stat-label">{s.label}</span>
+            </div>
+          ))}
         </div>
-        <div className="lp-hero-stats">
-          <div className="lp-stat">
-            <span className="lp-stat-num">4</span>
-            <span className="lp-stat-label">Services</span>
-          </div>
-          <div className="lp-stat">
-            <span className="lp-stat-num">50+</span>
-            <span className="lp-stat-label">Data Plans</span>
-          </div>
-          <div className="lp-stat">
-            <span className="lp-stat-num">2</span>
-            <span className="lp-stat-label">Countries (NG & GH)</span>
-          </div>
-          <div className="lp-stat">
-            <span className="lp-stat-num">&lt;5s</span>
-            <span className="lp-stat-label">Avg. Delivery</span>
-          </div>
-          <div className="lp-stat">
-            <span className="lp-stat-num">24/7</span>
-            <span className="lp-stat-label">Always Online</span>
-          </div>
+
+        <div className="hero-scroll-hint">
+          <span />
         </div>
       </section>
 
-      {/* ── NETWORKS ── */}
-      <section className="lp-section lp-section-alt" id="networks">
-        <div className="section-header">
-          <span className="section-tag">Supported Networks</span>
-          <h2 className="section-title">7 Networks Across Nigeria & Ghana</h2>
-          <p className="section-sub">Nigeria and Ghana covered. MTN, Airtel, Glo, 9Mobile, Vodafone Ghana, and AirtelTigo — all supported.</p>
+      {/* ── SERVICES ── */}
+      <section className="lp-section" id="services" ref={svcRef}>
+        <div className={`section-header ${svcIn ? 'fade-up-in' : 'fade-up-out'}`}>
+          <span className="section-tag">What We Offer</span>
+          <h2 className="section-title">Four Services, One Wallet</h2>
+          <p className="section-sub">Stay connected, entertained, and powered — without leaving the app.</p>
         </div>
-        <div className="lp-networks">
-          {NETWORKS.map(n => (
-            <div className="lp-network-badge" key={n.name}>
-              <span className="lp-network-dot" style={{ background: n.color }}></span>
-              {n.flag} {n.name}
-              <CheckCircle size={16} color="#00b96b" />
+        <div className="lp-services-grid">
+          {SERVICES.map((s, i) => (
+            <div
+              key={s.title}
+              className={`lp-service-card ${svcIn ? 'fade-up-in' : 'fade-up-out'}`}
+              style={{ '--i': i }}
+            >
+              <div className="lp-svc-top">
+                <div className="lp-service-icon" style={{ background: s.gradient }}>
+                  {s.icon}
+                </div>
+                <span className="lp-svc-badge">{s.badge}</span>
+              </div>
+              <h3>{s.title}</h3>
+              <p>{s.desc}</p>
+              <Link to={s.link} className="lp-service-link">
+                Get started <span>→</span>
+              </Link>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ── SERVICES ── */}
-      <section className="lp-section" id="services">
-        <div className="section-header">
-          <span className="section-tag">What We Offer</span>
-          <h2 className="section-title">Four Essential Services,<br />One Wallet</h2>
-          <p className="section-sub">Everything you need to stay connected, entertained, and powered — without leaving the app.</p>
+      {/* ── NETWORKS ── */}
+      <section className="lp-section lp-section-alt" id="networks" ref={netRef}>
+        <div className={`section-header ${netIn ? 'fade-up-in' : 'fade-up-out'}`}>
+          <span className="section-tag">Coverage</span>
+          <h2 className="section-title">7 Networks, 2 Countries</h2>
+          <p className="section-sub">Nigeria and Ghana covered. Every major network, one platform.</p>
         </div>
-        <div className="lp-services-grid">
-          {SERVICES.map(s => (
-            <div className="lp-service-card" key={s.title}>
-              <div className="lp-service-icon" style={{ background: s.color }}>
-                {s.icon}
-              </div>
-              <h3>{s.title}</h3>
-              <p>{s.desc}</p>
-              <ul>
-                {s.features.map(f => <li key={f}>{f}</li>)}
-              </ul>
-              <Link to={s.link} className="lp-service-link">Get started →</Link>
+        <div className="lp-networks">
+          {NETWORKS.map((n, i) => (
+            <div
+              key={n.name}
+              className={`lp-network-badge ${netIn ? 'pop-in' : 'pop-out'}`}
+              style={{ '--i': i }}
+            >
+              <span className="lp-network-dot" style={{ background: n.color }} />
+              {n.flag} {n.full}
+              <CheckCircle size={15} color="#00b96b" />
             </div>
           ))}
         </div>
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section className="lp-section lp-section-alt" id="how-it-works">
-        <div className="section-header">
+      <section className="lp-section" id="how-it-works" ref={stepsRef}>
+        <div className={`section-header ${stepsIn ? 'fade-up-in' : 'fade-up-out'}`}>
           <span className="section-tag">How It Works</span>
           <h2 className="section-title">Up and Running in 4 Steps</h2>
           <p className="section-sub">From zero to your first transaction in under 3 minutes.</p>
         </div>
         <div className="lp-steps">
-          {STEPS.map(s => (
-            <div className="lp-step" key={s.num}>
-              <div className="lp-step-num">{s.num}</div>
+          {STEPS.map((s, i) => (
+            <div
+              key={s.num}
+              className={`lp-step ${stepsIn ? 'fade-up-in' : 'fade-up-out'}`}
+              style={{ '--i': i }}
+            >
+              <div className="lp-step-icon">{s.icon}</div>
+              <div className="lp-step-num-badge">{s.num}</div>
+              <h3>{s.title}</h3>
+              <p>{s.desc}</p>
+              {i < STEPS.length - 1 && <div className="lp-step-connector" />}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── SECURITY ── */}
+      <section className="lp-section lp-section-dark" id="security" ref={secRef}>
+        <div className={`section-header ${secIn ? 'fade-up-in' : 'fade-up-out'}`}>
+          <span className="section-tag section-tag-dark">
+            <Shield size={12} style={{ marginRight: 5 }} />Security
+          </span>
+          <h2 className="section-title" style={{ color: '#fff' }}>Built Secure From Day One</h2>
+          <p className="section-sub section-sub-white">Multiple layers of protection on every transaction.</p>
+        </div>
+        <div className="lp-security-grid">
+          {SECURITY.map((s, i) => (
+            <div
+              key={s.title}
+              className={`lp-security-card ${secIn ? 'fade-up-in' : 'fade-up-out'}`}
+              style={{ '--i': i }}
+            >
+              <div className="sec-icon">{s.icon}</div>
               <h3>{s.title}</h3>
               <p>{s.desc}</p>
             </div>
@@ -213,139 +295,47 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── WALLET FEATURES ── */}
-      <section className="lp-section" id="wallet">
-        <div className="section-header">
-          <span className="section-tag">Smart Wallet</span>
-          <h2 className="section-title">Your Money, Fully in Control</h2>
-          <p className="section-sub">The QuickTopUp wallet is built for speed, safety, and full transparency.</p>
-        </div>
-        <div className="lp-security-grid" style={{ '--card-bg': '#f7fafc' }}>
-          {[
-            { icon: <CreditCard size={22} color="#00b96b" />, title: 'Real-Time Balance', desc: 'Your available balance updates instantly after every transaction. No delays, no reconciliation required.' },
-            { icon: <Globe size={22} color="#4299e1" />, title: 'Bank Transfer Funding', desc: 'Fund your wallet via direct bank transfer to our First Bank account. No card required, no POS fees.' },
-            { icon: <Clock size={22} color="#9f7aea" />, title: 'Full Transaction Ledger', desc: 'Every credit and debit is logged with timestamp, reference, and balance-after. Export your history anytime.' },
-            { icon: <Shield size={22} color="#f6ad55" />, title: 'Spending Limits', desc: 'Daily limit of ₦50,000 and monthly limit of ₦200,000 protect your wallet from runaway charges.' },
-            { icon: <Lock size={22} color="#e53e3e" />, title: 'Wallet Lock', desc: 'Your wallet can be locked instantly if you suspect unauthorized access. All transactions are blocked until unlocked.' },
-            { icon: <CheckCircle size={22} color="#00b96b" />, title: 'Reserved Balance', desc: 'Pending transactions hold a reserved balance to prevent double-spending. Released immediately on failure.' },
-          ].map(w => (
-            <div className="lp-service-card" key={w.title}>
-              <div style={{ marginBottom: 4 }}>{w.icon}</div>
-              <h3>{w.title}</h3>
-              <p style={{ fontSize: '0.88rem', color: '#718096', lineHeight: 1.65 }}>{w.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── SECURITY ── */}
-      <section className="lp-section lp-section-dark" id="security">
-        <div className="section-header">
-          <span className="section-tag section-tag-dark">Security</span>
-          <h2 className="section-title" style={{ color: '#fff' }}>Built Secure From the Ground Up</h2>
-          <p className="section-sub section-sub-white">We don't bolt on security as an afterthought. Every layer of QuickTopUp is designed to protect your money and data.</p>
-        </div>
-        <div className="lp-security-grid">
-          {SECURITY.map(s => (
-            <div className="lp-security-card" key={s.title}>
-              <h3><span className="sec-icon">{s.icon}</span>{s.title}</h3>
-              <p>{s.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── PAYMENT OPTIONS ── */}
-      <section className="lp-section lp-section-alt" id="payments">
-        <div className="section-header">
-          <span className="section-tag">Payment</span>
-          <h2 className="section-title">Powered by Flutterwave</h2>
-          <p className="section-sub">QuickTopUp uses Flutterwave for payments and integrates with VTU.ng, VTPass, and Hubtel to deliver services across Nigeria and Ghana. Multiple redundant providers ensure maximum uptime.</p>
-        </div>
-        <div className="lp-services-grid" style={{ maxWidth: 860 }}>
-          {[
-            { icon: '🏦', color: '#e6f9f0', title: 'Bank Transfer', desc: 'Fund your wallet directly from your bank account. Works with any Nigerian bank. No card details needed.' },
-            { icon: '🔗', color: '#ebf8ff', title: 'Payment Links', desc: 'Initiate payments via Flutterwave-hosted checkout. Secure, PCI-DSS compliant, and mobile-friendly.' },
-            { icon: '🔔', color: '#faf5ff', title: 'Webhook Confirmations', desc: 'Every payment is confirmed via Flutterwave webhooks before your wallet is credited. No false credits, ever.' },
-          ].map(p => (
-            <div className="lp-service-card" key={p.title}>
-              <div className="lp-service-icon" style={{ background: p.color }}>{p.icon}</div>
-              <h3>{p.title}</h3>
-              <p>{p.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* ── FAQ ── */}
-      <section className="lp-section" id="faq">
-        <div className="section-header">
+      <section className="lp-section lp-section-alt" id="faq" ref={faqRef}>
+        <div className={`section-header ${faqIn ? 'fade-up-in' : 'fade-up-out'}`}>
           <span className="section-tag">FAQ</span>
           <h2 className="section-title">Common Questions</h2>
-          <p className="section-sub">Everything you might want to know before signing up.</p>
+          <p className="section-sub">Everything you need to know before getting started.</p>
         </div>
         <div className="lp-faq">
-          {FAQS.map(f => (
-            <div className="lp-faq-item" key={f.q}>
-              <div className="lp-faq-q">{f.q}</div>
-              <div className="lp-faq-a">{f.a}</div>
-            </div>
-          ))}
+          {FAQS.map((f, i) => <FaqItem key={f.q} q={f.q} a={f.a} i={i} />)}
         </div>
       </section>
 
-      {/* ── CTA BANNER ── */}
-      <div className="lp-cta-banner">
-        <h2>Ready to Never Visit a Recharge Card Seller Again?</h2>
-        <p>Join thousands of users across Nigeria and Ghana who pay bills, buy data, and recharge airtime in seconds.</p>
-        <Link to="/register" className="btn-cta-white">Create Your Free Account →</Link>
-      </div>
+      {/* ── CTA ── */}
+      <section className="lp-cta" ref={ctaRef}>
+        <div className="cta-bg-blob" />
+        <div className={`lp-cta-inner ${ctaIn ? 'fade-up-in' : 'fade-up-out'}`}>
+          <h2>Ready to Top Up in Seconds?</h2>
+          <p>Join thousands across Nigeria and Ghana who never visit a recharge card seller again.</p>
+          <div className="lp-cta-actions">
+            <Link to="/register" className="btn-hero-primary">Create Free Account →</Link>
+            <Link to="/login" className="btn-hero-secondary">Sign In</Link>
+          </div>
+        </div>
+      </section>
 
       {/* ── FOOTER ── */}
       <footer className="lp-footer">
-        <div className="lp-footer-top">
-          <div className="lp-footer-brand">
-            <Link to="/" className="lp-logo">
-              <div className="lp-logo-icon">
-                <Zap size={16} />
-              </div>
-              <span className="lp-logo-text" style={{ color: '#fff' }}>Quick<span>TopUp</span>.ng</span>
-            </Link>
-            <p>Fast VTU services for Nigeria and Ghana. Airtime, data, cable TV, and electricity — all in one wallet.</p>
+        <div className="lp-footer-inner">
+          <Link to="/" className="lp-logo">
+            <div className="lp-logo-icon"><Zap size={16} /></div>
+            <span className="lp-logo-text">Quick<span>TopUp</span>.ng</span>
+          </Link>
+          <p className="lp-footer-tagline">Fast VTU services for Nigeria &amp; Ghana — one wallet, every service.</p>
+          <div className="lp-footer-links">
+            <a href="#services">Services</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#security">Security</a>
+            <a href="#faq">FAQ</a>
+            <a href="mailto:quicktopup.it.com@gmail.com">Support</a>
           </div>
-          <div className="lp-footer-col">
-            <h4>Services</h4>
-            <ul>
-              <li><Link to="/register">Airtime Top-Up</Link></li>
-              <li><Link to="/register">Data Bundles</Link></li>
-              <li><Link to="/register">Cable TV</Link></li>
-              <li><Link to="/register">Electricity Bills</Link></li>
-            </ul>
-          </div>
-          <div className="lp-footer-col">
-            <h4>Account</h4>
-            <ul>
-              <li><Link to="/register">Sign Up</Link></li>
-              <li><Link to="/login">Log In</Link></li>
-              <li><Link to="/forgot-password">Reset Password</Link></li>
-            </ul>
-          </div>
-          <div className="lp-footer-col">
-            <h4>Support</h4>
-            <ul>
-              <li><a href="mailto:quicktopup.it.com@gmail.com">Email Support</a></li>
-              <li><a href="https://docs.quicktopup.it.com" target="_blank" rel="noreferrer">Documentation</a></li>
-              <li><a href="https://status.quicktopup.it.com" target="_blank" rel="noreferrer">System Status</a></li>
-            </ul>
-          </div>
-        </div>
-        <div className="lp-footer-bottom">
-          <span>© 2026 QuickTopUp.ng · All rights reserved</span>
-          <span>
-            <Link to="/privacy">Privacy Policy</Link> &nbsp;·&nbsp;
-            <Link to="/terms">Terms of Service</Link> &nbsp;·&nbsp;
-            <a href="https://status.quicktopup.it.com" target="_blank" rel="noreferrer">System Status</a>
-          </span>
+          <p className="lp-footer-copy">© {new Date().getFullYear()} QuickTopUp.ng — All rights reserved.</p>
         </div>
       </footer>
 
