@@ -8,6 +8,9 @@ const client = axios.create({
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
+    // ngrok shows a browser warning interstitial page for unrecognised browsers.
+    // This header bypasses it so we always get JSON back instead of HTML.
+    'ngrok-skip-browser-warning': '1',
   },
 });
 
@@ -27,7 +30,7 @@ client.interceptors.request.use((config) => {
 client.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Log full error for debugging
+    // Log full error for debugging in development
     if (process.env.NODE_ENV === 'development') {
       console.error('[API Error]', {
         url: error.config?.url,
