@@ -13,7 +13,8 @@ export default function NotificationsPage() {
     setLoading(true);
     try {
       const res = await getNotifications();
-      setNotifs(res.data.data || []);
+      const raw = res.data?.data || res.data;
+      setNotifs(raw?.results || (Array.isArray(raw) ? raw : []));
     } catch {} finally { setLoading(false); }
   };
 

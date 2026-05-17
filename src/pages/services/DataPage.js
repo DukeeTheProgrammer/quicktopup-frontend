@@ -32,7 +32,7 @@ export default function DataPage() {
   const selectedCountry = COUNTRIES.find(c => c.code === country);
 
   useEffect(() => {
-    getNetworks().then(r => setNetworks(r.data.data || [])).catch(() => {});
+    getNetworks().then(r => { const raw = r.data?.data; setNetworks(raw?.results || (Array.isArray(raw) ? raw : [])); }).catch(() => {});
   }, []);
 
   const handlePhoneChange = (e) => {
@@ -53,7 +53,7 @@ export default function DataPage() {
     setPlansLoading(true);
     try {
       const r = await getDataPlans(code);
-      setPlans(r.data.data || []);
+      const raw = r.data?.data; setPlans(raw?.results || (Array.isArray(raw) ? raw : []));
     } catch { setPlans([]); } finally { setPlansLoading(false); }
   };
 

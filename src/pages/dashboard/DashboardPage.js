@@ -34,8 +34,8 @@ export default function DashboardPage() {
     const load = async () => {
       try {
         const [wRes, tRes] = await Promise.all([getWallet(), getTransactions({ page_size: 5 })]);
-        setWallet(wRes.data.data);
-        setTxns(tRes.data.data || []);
+        setWallet(wRes.data?.data || wRes.data);
+        const tRaw = tRes.data?.data; setTxns(tRaw?.results || (Array.isArray(tRaw) ? tRaw : []));
         refreshUser();
       } catch {} finally { setLoading(false); }
     };

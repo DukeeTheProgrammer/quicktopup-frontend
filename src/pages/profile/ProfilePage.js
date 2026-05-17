@@ -39,8 +39,8 @@ export default function ProfilePage() {
             <span className={`badge ${user?.is_verified ? 'badge-success' : 'badge-warning'}`}>
               {user?.is_verified ? <><CheckCircle size={11} /> Verified</> : <><Clock size={11} /> Unverified</>}
             </span>
-            <span className={`badge ${user?.kyc_status === 'approved' ? 'badge-success' : 'badge-warning'}`}>
-              KYC: {user?.kyc_status || 'pending'}
+            <span className={`badge ${user?.kyc_status === 'approved' ? 'badge-success' : user?.kyc_status === 'unverified' ? 'badge-danger' : 'badge-warning'}`}>
+              KYC: {user?.kyc_status || 'unverified'}
             </span>
           </div>
         </div>

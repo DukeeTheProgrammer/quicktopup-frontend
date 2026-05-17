@@ -61,7 +61,8 @@ export default function WalletPage() {
       }
 
       if (lr.status === 'fulfilled') {
-        const ledgerData = lr.value?.data?.data || lr.value?.data || [];
+        const ledgerRaw = lr.value?.data?.data;
+        const ledgerData = ledgerRaw?.results || (Array.isArray(ledgerRaw) ? ledgerRaw : []);
         setLedger(Array.isArray(ledgerData) ? ledgerData : []);
       } else {
         // Ledger failure is non-fatal — just show empty

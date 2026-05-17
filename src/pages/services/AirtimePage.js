@@ -34,7 +34,7 @@ export default function AirtimePage() {
 
   useEffect(() => {
     getNetworks()
-      .then(r => setNetworks(r.data.data || []))
+      .then(r => { const raw = r.data?.data; setNetworks(raw?.results || (Array.isArray(raw) ? raw : [])); })
       .catch(() => {});
   }, []);
 

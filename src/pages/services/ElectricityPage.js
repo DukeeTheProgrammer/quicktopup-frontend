@@ -16,7 +16,7 @@ export default function ElectricityPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    getElectricityBillers().then(r => setBillers(r.data.data || [])).catch(() => {});
+    getElectricityBillers().then(r => { const raw = r.data?.data; setBillers(raw?.results || (Array.isArray(raw) ? raw : [])); }).catch(() => {});
   }, []);
 
   const handleBuy = async () => {

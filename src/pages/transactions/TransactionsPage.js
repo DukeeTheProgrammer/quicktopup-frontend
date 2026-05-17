@@ -16,7 +16,8 @@ export default function TransactionsPage() {
     try {
       const params = { page: p, page_size: 20, ...Object.fromEntries(Object.entries(f).filter(([, v]) => v)) };
       const res = await getTransactions(params);
-      setTxns(res.data.data || []);
+      const raw = res.data?.data;
+      setTxns(raw?.results || (Array.isArray(raw) ? raw : []));
     } catch {} finally { setLoading(false); }
   };
 

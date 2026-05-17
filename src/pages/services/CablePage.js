@@ -18,7 +18,7 @@ export default function CablePage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    getCablePlans().then(r => setPlans(r.data.data || [])).catch(() => {});
+    getCablePlans().then(r => { const raw = r.data?.data; setPlans(raw?.results || (Array.isArray(raw) ? raw : [])); }).catch(() => {});
   }, []);
 
   const filteredPlans = plans.filter(p => p.provider === provider && p.is_active);
