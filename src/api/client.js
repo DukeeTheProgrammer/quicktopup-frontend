@@ -8,18 +8,18 @@ const client = axios.create({
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
-    // NOTE: ngrok-skip-browser-warning is NOT sent here.
-    // It's not in the server's CORS_ALLOW_HEADERS, so including it causes
-    // the preflight to fail. The Django CORS config allows our Vercel origin
-    // directly, so we don't need it — ngrok only shows the interstitial for
-    // browser tab visits, not for programmatic API calls from an allowed origin.
   },
 });
 
+// Always read the token fresh from localStorage on every request.
+// This prevents the stale-token bug where the axios instance was created
+// before the token was written (e.g. right after login + window.location redirect).
 client.interceptors.request.use((config) => {
   const token = localStorage.getItem('auth_token');
   if (token) {
     config.headers['Authorization'] = `Token ${token}`;
+  } else {
+    delete config.headers['Authorization'];
   }
   return config;
 });
@@ -27,6 +27,15 @@ client.interceptors.request.use((config) => {
 client.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Log full error for debugging
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[API Error]', {
+        url: error.config?.url,
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message,
+      });
+    }
     if (error.response?.status === 401) {
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user');

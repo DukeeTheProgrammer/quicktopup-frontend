@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { getWallet, fundWallet, getWalletLedger } from '../../api/wallet';
 import toast from 'react-hot-toast';
-import { Wallet, ArrowDownCircle, ArrowUpCircle, Plus, ExternalLink, RefreshCw } from 'lucide-react';
+import { Wallet, ArrowDownCircle, ArrowUpCircle, Plus, RefreshCw, AlertCircle } from 'lucide-react';
 import './Wallet.css';
 
 const FUND_PRESETS = [1000, 2000, 5000, 10000, 20000, 50000];
@@ -12,10 +12,28 @@ const PAYMENT_METHODS = [
   { value: 'mobile_money', label: '💰 Mobile Money', desc: 'MTN MoMo, etc.' },
 ];
 
+function parseError(err) {
+  if (!err) return 'Something went wrong';
+  if (err.response) {
+    const d = err.response.data;
+    // Try all known error shapes from the API docs
+    return (
+      d?.error?.message ||
+      d?.message ||
+      d?.detail ||
+      (typeof d === 'string' ? d : null) ||
+      `Server error (${err.response.status})`
+    );
+  }
+  if (err.request) return 'No response from server. Is the backend running?';
+  return err.message || 'Unknown error';
+}
+
 export default function WalletPage() {
   const [wallet, setWallet] = useState(null);
   const [ledger, setLedger] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showFund, setShowFund] = useState(false);
   const [fundAmount, setFundAmount] = useState('');
   const [payMethod, setPayMethod] = useState('card');
@@ -24,18 +42,43 @@ export default function WalletPage() {
 
   const loadData = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
-      const [wr, lr] = await Promise.all([getWallet(), getWalletLedger()]);
-      setWallet(wr.data.data);
-      setLedger(lr.data.data || []);
+      // Load wallet and ledger in parallel; if either fails, surface the real error
+      const [wr, lr] = await Promise.allSettled([
+        getWallet(),
+        getWalletLedger(),
+      ]);
+
+      if (wr.status === 'fulfilled') {
+        // Handle both res.data.data and res.data shapes
+        const walletData = wr.value?.data?.data || wr.value?.data;
+        setWallet(walletData);
+      } else {
+        const msg = parseError(wr.reason);
+        setError(`Wallet: ${msg}`);
+        toast.error(`Wallet error: ${msg}`);
+      }
+
+      if (lr.status === 'fulfilled') {
+        const ledgerData = lr.value?.data?.data || lr.value?.data || [];
+        setLedger(Array.isArray(ledgerData) ? ledgerData : []);
+      } else {
+        // Ledger failure is non-fatal — just show empty
+        console.warn('Ledger load failed:', parseError(lr.reason));
+      }
     } catch (err) {
-      toast.error('Failed to load wallet data');
-    } finally { setLoading(false); }
+      const msg = parseError(err);
+      setError(msg);
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
 
-  // Check if returned from Flutterwave redirect
+  // Handle Flutterwave redirect callback
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const status = params.get('status');
@@ -49,45 +92,59 @@ export default function WalletPage() {
       } else if (status === 'failed') {
         toast.error('Payment failed. Please try again.');
       }
-      // Clean URL
       window.history.replaceState({}, '', window.location.pathname);
     }
   }, [loadData]);
 
   const handleFund = async () => {
-    if (!fundAmount || parseFloat(fundAmount) < 100) {
+    const amount = parseFloat(fundAmount);
+    if (!fundAmount || isNaN(amount) || amount < 100) {
       toast.error('Minimum funding amount is ₦100');
       return;
     }
     setFunding(true);
     try {
-      const redirectUrl = window.location.origin + '/wallet';
+      // redirect_url = where Flutterwave sends the user after payment
+      const redirectUrl = `${window.location.origin}/wallet`;
       const res = await fundWallet({
-        amount: fundAmount,
+        amount: String(amount),          // API expects string decimal
         payment_method: payMethod,
         redirect_url: redirectUrl,
       });
-      const data = res.data.data;
+      // Normalise response shape
+      const data = res.data?.data || res.data;
       const paymentLink = data?.payment_link;
+
       if (paymentLink) {
         toast.success('Redirecting to Flutterwave...');
         setShowFund(false);
-        // Redirect in same tab so callback URL works
         window.location.href = paymentLink;
       } else {
-        toast.success('Funding initiated! Reference: ' + data?.reference);
+        // Some payment methods (e.g. bank_transfer) may not return a link
+        toast.success(`Funding initiated! Reference: ${data?.reference || 'N/A'}`);
         setShowFund(false);
         loadData();
       }
     } catch (err) {
-      const msg = err.response?.data?.error?.message || err.response?.data?.message || 'Failed to initiate funding';
-      toast.error(msg);
-    } finally { setFunding(false); }
+      toast.error(parseError(err));
+    } finally {
+      setFunding(false);
+    }
   };
 
   if (loading) return (
     <div style={{ textAlign: 'center', padding: 80 }}>
       <div className="spinner spinner-dark" style={{ margin: '0 auto' }} />
+      <p style={{ marginTop: 16, color: 'var(--gray-500)', fontSize: 14 }}>Loading wallet…</p>
+    </div>
+  );
+
+  if (error && !wallet) return (
+    <div style={{ textAlign: 'center', padding: 60 }}>
+      <AlertCircle size={40} color="#e53e3e" style={{ margin: '0 auto 16px' }} />
+      <h3 style={{ fontWeight: 700, marginBottom: 8, color: '#e53e3e' }}>Failed to Load Wallet</h3>
+      <p style={{ color: 'var(--gray-500)', fontSize: 14, marginBottom: 24, maxWidth: 360, margin: '0 auto 24px' }}>{error}</p>
+      <button className="btn btn-primary" onClick={loadData}>Try Again</button>
     </div>
   );
 
@@ -109,7 +166,7 @@ export default function WalletPage() {
         </div>
         <div className="wb-avail">
           Available: ₦{parseFloat(wallet?.available_balance || 0).toLocaleString('en-NG', { minimumFractionDigits: 2 })}
-          {wallet?.reserved_balance > 0 && (
+          {parseFloat(wallet?.reserved_balance || 0) > 0 && (
             <span style={{ marginLeft: 10, opacity: 0.75 }}>
               · Reserved: ₦{parseFloat(wallet.reserved_balance).toLocaleString()}
             </span>
@@ -165,8 +222,8 @@ export default function WalletPage() {
           <div className="detail-row"><span>Lock Status</span><span className={`badge ${wallet?.is_locked ? 'badge-danger' : 'badge-success'}`}>{wallet?.is_locked ? '🔒 Locked' : '🔓 Unlocked'}</span></div>
           <div className="detail-row"><span>Daily Limit</span><span>₦{parseFloat(wallet?.daily_limit || 0).toLocaleString()}</span></div>
           <div className="detail-row"><span>Monthly Limit</span><span>₦{parseFloat(wallet?.monthly_limit || 0).toLocaleString()}</span></div>
-          <div className="detail-row"><span>Reserved Balance</span><span>₦{parseFloat(wallet?.reserved_balance || 0).toLocaleString()}</span></div>
-          <div className="detail-row"><span>Email</span><span>{wallet?.user_email}</span></div>
+          <div className="detail-row"><span>Reserved</span><span>₦{parseFloat(wallet?.reserved_balance || 0).toLocaleString()}</span></div>
+          <div className="detail-row"><span>Email</span><span style={{ wordBreak: 'break-all' }}>{wallet?.user_email}</span></div>
         </div>
       )}
 
@@ -196,8 +253,10 @@ export default function WalletPage() {
 
       {/* Fund Modal */}
       {showFund && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: 20 }}
-          onClick={(e) => { if (e.target === e.currentTarget) setShowFund(false); }}>
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: 20 }}
+          onClick={(e) => { if (e.target === e.currentTarget) setShowFund(false); }}
+        >
           <div style={{ background: 'white', borderRadius: 20, padding: 32, width: '100%', maxWidth: 420 }}>
             <h3 style={{ fontWeight: 800, marginBottom: 6 }}>Fund Wallet</h3>
             <p style={{ fontSize: 13, color: 'var(--gray-500)', marginBottom: 24 }}>
@@ -220,40 +279,46 @@ export default function WalletPage() {
                   </button>
                 ))}
               </div>
-              <input className="form-input" type="number" placeholder="Or enter custom amount (min ₦100)"
-                value={fundAmount} onChange={e => setFundAmount(e.target.value)} min="100" />
+              <input
+                className="form-input"
+                type="number"
+                placeholder="Or enter custom amount"
+                value={fundAmount}
+                min="100"
+                onChange={e => setFundAmount(e.target.value)}
+              />
             </div>
 
             <div className="form-group">
               <label className="form-label">Payment Method</label>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {PAYMENT_METHODS.map(m => (
-                  <button key={m.value} type="button"
+                  <label key={m.value}
                     style={{
-                      padding: '12px 16px', borderRadius: 10, cursor: 'pointer', textAlign: 'left',
-                      border: `2px solid ${payMethod === m.value ? 'var(--green)' : 'var(--gray-200)'}`,
-                      background: payMethod === m.value ? 'var(--green-light)' : 'white',
-                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    }}
-                    onClick={() => setPayMethod(m.value)}>
+                      display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
+                      borderRadius: 12, cursor: 'pointer',
+                      border: `1.5px solid ${payMethod === m.value ? 'var(--green)' : 'var(--gray-200)'}`,
+                      background: payMethod === m.value ? 'var(--green-light)' : '#fff',
+                    }}>
+                    <input type="radio" name="payMethod" value={m.value}
+                      checked={payMethod === m.value}
+                      onChange={() => setPayMethod(m.value)}
+                      style={{ accentColor: 'var(--green)' }} />
                     <div>
-                      <div style={{ fontWeight: 700, fontSize: 14 }}>{m.label}</div>
+                      <div style={{ fontWeight: 600, fontSize: 14 }}>{m.label}</div>
                       <div style={{ fontSize: 12, color: 'var(--gray-500)' }}>{m.desc}</div>
                     </div>
-                    {payMethod === m.value && <span style={{ color: 'var(--green)', fontWeight: 700 }}>✓</span>}
-                  </button>
+                  </label>
                 ))}
               </div>
             </div>
 
-            <div style={{ background: '#f0fff8', border: '1px solid #b2f5d8', borderRadius: 10, padding: 12, marginBottom: 20, fontSize: 13, color: '#276749' }}>
-              💡 You'll be redirected to Flutterwave to complete payment. Your wallet updates automatically on success.
-            </div>
-
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button className="btn btn-secondary btn-full" onClick={() => setShowFund(false)}>Cancel</button>
+            <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+              <button className="btn btn-outline btn-full" onClick={() => setShowFund(false)} disabled={funding}>
+                Cancel
+              </button>
               <button className="btn btn-primary btn-full" onClick={handleFund} disabled={funding}>
-                {funding ? <span className="spinner" /> : <><ExternalLink size={14} /> Proceed to Pay</>}
+                {funding ? <span className="spinner" /> : `Pay ₦${parseFloat(fundAmount || 0).toLocaleString()}`}
               </button>
             </div>
           </div>
