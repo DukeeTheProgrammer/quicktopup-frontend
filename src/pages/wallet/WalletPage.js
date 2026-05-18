@@ -133,29 +133,39 @@ export default function WalletPage() {
     }
     setFunding(true);
     try {
-      // redirect_url = where Flutterwave sends the user after payment
       const redirectUrl = `${window.location.origin}/wallet`;
       const res = await fundWallet({
-        amount: String(amount),          // API expects string decimal
+        amount,                 // API accepts number
         payment_method: payMethod,
         redirect_url: redirectUrl,
       });
-      // Normalise response shape
       const data = res.data?.data || res.data;
+      // Show fee breakdown to user before redirect
+      const fee = parseFloat(data?.fee || 0);
+      const total = parseFloat(data?.total_amount || amount);
+      if (fee > 0) {
+        toast.success(
+          `Processing fee: ₦${fee.toLocaleString()} · You'll pay ₦${total.toLocaleString()} total`,
+          { duration: 5000, icon: 'ℹ️' }
+        );
+      }
       const paymentLink = data?.payment_link;
-
       if (paymentLink) {
-        toast.success('Redirecting to Flutterwave...');
+        setTimeout(() => { window.location.href = paymentLink; }, fee > 0 ? 2000 : 0);
         setShowFund(false);
-        window.location.href = paymentLink;
       } else {
-        // Some payment methods (e.g. bank_transfer) may not return a link
         toast.success(`Funding initiated! Reference: ${data?.reference || 'N/A'}`);
         setShowFund(false);
         loadData();
       }
     } catch (err) {
-      toast.error(parseError(err));
+      const errCode = err.response?.data?.error?.code;
+      const errMsg = err.response?.data?.error?.message || parseError(err);
+      const MAP = {
+        WALLET_LOCKED: '🔒 Your wallet is locked. Contact support.',
+        PAYMENT_INIT_FAILED: '❌ Payment initiation failed. Try a different payment method.',
+      };
+      toast.error(MAP[errCode] || errMsg);
     } finally {
       setFunding(false);
     }
