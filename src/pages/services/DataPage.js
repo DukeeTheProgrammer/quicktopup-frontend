@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { getNetworks, getDataPlans } from '../../api/services';
 import { purchaseData } from '../../api/transactions';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import PinModal from './PinModal';
-import { Wifi, AlertCircle } from 'lucide-react';
+import { Wifi, AlertCircle, RefreshCw } from 'lucide-react';
 import './ServicePage.css';
 
 const NET_COLORS = {
@@ -20,6 +20,31 @@ const COUNTRIES = [
 ];
 const GH_CODES = ['vodafone', 'airteltigo'];
 const isGhanaNetwork = (code) => GH_CODES.includes((code || '').toLowerCase());
+
+function parseServiceList(r, key) {
+  const d = r.data?.data;
+  if (d && Array.isArray(d[key])) return d[key];
+  if (d && Array.isArray(d.results)) return d.results;
+  if (Array.isArray(d)) return d;
+  if (Array.isArray(r.data)) return r.data;
+  return [];
+}
+
+function getErrorMsg(err) {
+  const code = err.response?.data?.error?.code;
+  const msg = err.response?.data?.error?.message || err.response?.data?.message;
+  const MAP = {
+    INSUFFICIENT_FUNDS: '❌ Wallet balance too low. Please fund your wallet first.',
+    INVALID_PIN: '🔐 Wrong transaction PIN. Please try again.',
+    WALLET_LOCKED: '🔒 Your wallet is locked. Contact support.',
+    PIN_REQUIRED: '🔑 Set a transaction PIN first — go to Profile → Security.',
+    DUPLICATE_REQUEST: '⚠️ Duplicate transaction detected. Please wait before retrying.',
+    TRANSACTION_FAILED: '❌ Transaction rejected by the network provider. Please try again.',
+    PAYMENT_INIT_FAILED: '❌ Payment initiation failed. Try a different method.',
+    FETCH_FAILED: '⚠️ Could not load service data. Please retry.',
+  };
+  return MAP[code] || msg || 'Something went wrong. Please try again.';
+}
 
 function FieldError({ msg }) {
   if (!msg) return null;
@@ -39,16 +64,29 @@ export default function DataPage() {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [networksLoading, setNetworksLoading] = useState(true);
+  const [networksError, setNetworksError] = useState(null);
   const [plansLoading, setPlansLoading] = useState(false);
+  const [plansError, setPlansError] = useState(null);
   const [showPin, setShowPin] = useState(false);
 
   const selectedCountry = COUNTRIES.find(c => c.code === country);
 
-  useEffect(() => {
+  const loadNetworks = useCallback(() => {
+    setNetworksLoading(true);
+    setNetworksError(null);
     getNetworks()
-      .then(r => { const raw = r.data?.data; setNetworks(raw?.results || (Array.isArray(raw) ? raw : [])); })
-      .catch(() => {});
+      .then(r => {
+        const list = parseServiceList(r, 'networks');
+        if (list.length === 0 && r.data?.error?.code === 'FETCH_FAILED') {
+          setNetworksError('Could not load networks from provider. Please retry.');
+        } else { setNetworks(list); }
+      })
+      .catch(() => setNetworksError('Could not load networks. Please retry.'))
+      .finally(() => setNetworksLoading(false));
   }, []);
+
+  useEffect(() => { loadNetworks(); }, [loadNetworks]);
 
   const filteredNetworks = networks.filter(n => {
     const code = (n.code || '').toLowerCase();
@@ -71,12 +109,16 @@ export default function DataPage() {
     setSelectedPlan(null);
     setErrors(p => ({ ...p, network: '', plan: '' }));
     setPlansLoading(true);
+    setPlansError(null);
     try {
-      // API docs: filter param is lowercase network code e.g. "mtn"
       const r = await getDataPlans(code.toLowerCase());
-      const raw = r.data?.data;
-      setPlans(raw?.results || (Array.isArray(raw) ? raw : []));
-    } catch { setPlans([]); }
+      if (r.data?.error?.code === 'FETCH_FAILED') {
+        setPlansError('Could not load data plans right now. Please retry.');
+        setPlans([]);
+      } else {
+        setPlans(parseServiceList(r, 'plans'));
+      }
+    } catch { setPlansError('Could not load data plans. Please retry.'); setPlans([]); }
     finally { setPlansLoading(false); }
   };
 
@@ -90,9 +132,9 @@ export default function DataPage() {
     }
     if (!form.plan_id) e.plan = 'Please select a data plan';
     if (selectedPlan) {
-      const price = parseFloat(selectedPlan.selling_price);
+      const price = parseFloat(selectedPlan.amount || selectedPlan.selling_price || 0);
       if (price > parseFloat(user?.wallet_balance || 0)) {
-        e.plan = `Insufficient wallet balance (need ${selectedCountry.currency}${price.toLocaleString()})`;
+        e.plan = `Insufficient balance (need ${selectedCountry.currency}${price.toLocaleString()})`;
       }
     }
     return e;
@@ -110,7 +152,7 @@ export default function DataPage() {
     try {
       await purchaseData({
         phone: form.phone.trim(),
-        network: form.network.toUpperCase(),
+        network: form.network.toLowerCase(),
         plan_id: form.plan_id,
         pin,
       });
@@ -120,12 +162,13 @@ export default function DataPage() {
       setShowPin(false);
       refreshUser();
     } catch (err) {
-      const e = err.response?.data;
-      const msg = e?.error?.message || e?.message || 'Purchase failed';
-      toast.error(msg);
-      if (e?.error?.code === 'INSUFFICIENT_FUNDS') setErrors(p => ({ ...p, plan: 'Insufficient wallet balance' }));
+      toast.error(getErrorMsg(err));
+      const code = err.response?.data?.error?.code;
+      if (code === 'INSUFFICIENT_FUNDS') setErrors(p => ({ ...p, plan: 'Insufficient wallet balance' }));
     } finally { setLoading(false); }
   };
+
+  const planPrice = (plan) => parseFloat(plan.amount || plan.selling_price || 0);
 
   return (
     <div className="service-page">
@@ -150,19 +193,32 @@ export default function DataPage() {
         {/* Network */}
         <div className="form-group">
           <label className="form-label">Select Network</label>
-          <div className="network-grid">
-            {filteredNetworks.map(net => (
-              <button key={net.id} type="button"
-                className={`network-btn ${form.network === net.code ? 'selected' : ''}`}
-                onClick={() => selectNetwork(net.code)}>
-                <div className="net-icon"
-                  style={{ background: NET_COLORS[displayCode(net.code)] || '#718096', color: 'white' }}>
-                  {displayCode(net.code).slice(0, 3)}
-                </div>
-                {net.name?.split(' ')[0]}
-              </button>
-            ))}
-          </div>
+          {networksLoading ? (
+            <div style={{ textAlign: 'center', padding: 16 }}>
+              <div className="spinner spinner-dark" style={{ margin: '0 auto' }} />
+              <p style={{ fontSize: 12, color: 'var(--gray-400)', marginTop: 8 }}>Loading networks…</p>
+            </div>
+          ) : networksError ? (
+            <div className="fetch-error-box">
+              <AlertCircle size={16} />
+              <span>{networksError}</span>
+              <button className="retry-btn" onClick={loadNetworks}><RefreshCw size={12} /> Retry</button>
+            </div>
+          ) : (
+            <div className="network-grid">
+              {filteredNetworks.map(net => (
+                <button key={net.id || net.code} type="button"
+                  className={`network-btn ${form.network === net.code ? 'selected' : ''}`}
+                  onClick={() => selectNetwork(net.code)}>
+                  <div className="net-icon"
+                    style={{ background: NET_COLORS[displayCode(net.code)] || '#718096', color: 'white' }}>
+                    {displayCode(net.code).slice(0, 3)}
+                  </div>
+                  {net.name?.split(' ')[0]}
+                </button>
+              ))}
+            </div>
+          )}
           <FieldError msg={errors.network} />
         </div>
 
@@ -175,7 +231,7 @@ export default function DataPage() {
           <FieldError msg={errors.phone} />
         </div>
 
-        {/* Plans — fetched from backend after network selection */}
+        {/* Plans */}
         {form.network && (
           <div className="form-group">
             <label className="form-label">
@@ -186,20 +242,26 @@ export default function DataPage() {
               <div style={{ textAlign: 'center', padding: 20 }}>
                 <div className="spinner spinner-dark" style={{ margin: '0 auto' }} />
               </div>
-            ) : plans.filter(p => p.is_active).length === 0 ? (
+            ) : plansError ? (
+              <div className="fetch-error-box">
+                <AlertCircle size={16} />
+                <span>{plansError}</span>
+                <button className="retry-btn" onClick={() => selectNetwork(form.network)}><RefreshCw size={12} /> Retry</button>
+              </div>
+            ) : plans.filter(p => p.is_active !== false).length === 0 ? (
               <div style={{ padding: 16, background: 'var(--gray-100)', borderRadius: 10, fontSize: 14, color: 'var(--gray-500)', textAlign: 'center' }}>
                 No plans available for {displayCode(form.network)} right now
               </div>
             ) : (
               <div className="plan-grid">
-                {plans.filter(p => p.is_active).map(plan => (
-                  <button key={plan.id} type="button"
-                    className={`plan-btn ${form.plan_id === plan.id ? 'selected' : ''}`}
-                    onClick={() => { setForm(p => ({ ...p, plan_id: plan.id })); setSelectedPlan(plan); setErrors(p => ({ ...p, plan: '' })); }}>
+                {plans.filter(p => p.is_active !== false).map(plan => (
+                  <button key={plan.id || plan.plan_code} type="button"
+                    className={`plan-btn ${form.plan_id === (plan.id || plan.plan_code) ? 'selected' : ''}`}
+                    onClick={() => { setForm(p => ({ ...p, plan_id: plan.id || plan.plan_code })); setSelectedPlan(plan); setErrors(p => ({ ...p, plan: '' })); }}>
                     <div className="plan-name">{plan.name}</div>
                     <div className="plan-size">{plan.data_size}</div>
-                    <div className="plan-price">{selectedCountry.currency}{parseFloat(plan.selling_price).toLocaleString()}</div>
-                    <div className="plan-validity">{plan.validity_days} days</div>
+                    <div className="plan-price">{selectedCountry.currency}{planPrice(plan).toLocaleString()}</div>
+                    {plan.validity_days && <div className="plan-validity">{plan.validity_days} days</div>}
                   </button>
                 ))}
               </div>
@@ -208,23 +270,19 @@ export default function DataPage() {
           </div>
         )}
 
-        {/* Summary */}
         {selectedPlan && form.phone && Object.keys(errors).length === 0 && (
           <div className="summary-box">
             <div className="summary-row"><span>Country</span><span>{selectedCountry.label}</span></div>
             <div className="summary-row"><span>Plan</span><span>{selectedPlan.name}</span></div>
-            <div className="summary-row"><span>Data</span><span>{selectedPlan.data_size} / {selectedPlan.validity_days} days</span></div>
+            {selectedPlan.data_size && <div className="summary-row"><span>Data</span><span>{selectedPlan.data_size}{selectedPlan.validity_days ? ` / ${selectedPlan.validity_days} days` : ''}</span></div>}
             <div className="summary-row"><span>Phone</span><span>{form.phone}</span></div>
-            <div className="summary-row"><span>Total</span>
-              <span><strong>{selectedCountry.currency}{parseFloat(selectedPlan.selling_price).toLocaleString()}</strong></span>
-            </div>
+            <div className="summary-row"><span>Total</span><span><strong>{selectedCountry.currency}{planPrice(selectedPlan).toLocaleString()}</strong></span></div>
           </div>
         )}
 
-        <button className="btn btn-primary btn-full btn-lg" onClick={handleBuy} disabled={loading}>
+        <button className="btn btn-primary btn-full btn-lg" onClick={handleBuy} disabled={loading || networksLoading}>
           {loading ? <span className="spinner" /> : <><Wifi size={16} /> Buy Data</>}
         </button>
-
         <p style={{ fontSize: 12, color: 'var(--gray-500)', textAlign: 'center', marginTop: 12 }}>
           Wallet balance: ₦{parseFloat(user?.wallet_balance || 0).toLocaleString()}
         </p>
