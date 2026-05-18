@@ -99,6 +99,26 @@ const QUICK_TOPICS = [
   { label: '📺 Cable TV', id: 'cable_sub' },
   { label: '🔑 Transaction PIN', id: 'pin_set' },
   { label: '❌ Transaction Failed', id: 'failed_txn' },
+  { label: '🔒 Wallet Locked', id: 'wallet_locked' },
+  { label: '💸 Processing Fee', id: 'fund_fee' },
+  {
+    id: 'fetch_failed',
+    patterns: ['plans not loading', 'networks not showing', 'cant see plans', 'empty list', 'no networks', 'no billers', 'fetch failed', 'service unavailable', 'provider down'],
+    q: 'Why are networks / data plans / cable plans not loading?',
+    a: "Our service catalog is fetched live from VTpass. If you see an error or empty lists, the provider API may be temporarily unavailable. Tap the Retry button on the page. If it persists, check back in a few minutes.",
+  },
+  {
+    id: 'wallet_locked',
+    patterns: ['wallet locked', 'locked', 'account locked', 'cant transact', 'locked out'],
+    q: 'My wallet is locked — what do I do?',
+    a: 'A locked wallet prevents all transactions. Contact us at quicktopup.it.com@gmail.com with your registered email and we will review and unlock it.',
+  },
+  {
+    id: 'fund_fee',
+    patterns: ['fee', 'processing fee', 'charge', 'extra charge', '3 percent', 'why am i paying more', 'total amount'],
+    q: 'Why is the total amount higher than what I entered?',
+    a: "A 3% processing fee is added to all wallet funding by Flutterwave (our payment processor). Your wallet is credited with the original amount you entered — only the Flutterwave checkout total includes the fee.",
+  },
 ];
 
 // ─────────────────────────────────────────
