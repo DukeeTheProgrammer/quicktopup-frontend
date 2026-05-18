@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { getElectricityBillers } from '../../api/services';
 import { purchaseElectricity } from '../../api/transactions';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
-import { Zap, AlertCircle } from 'lucide-react';
+import { Zap, AlertCircle, RefreshCw } from 'lucide-react';
 import PinModal from './PinModal';
 import './ServicePage.css';
 
@@ -12,8 +12,31 @@ const METER_TYPES = [
   { value: 'prepaid', label: '⚡ Prepaid' },
   { value: 'postpaid', label: '📋 Postpaid' },
 ];
-// Meter numbers are typically 11 digits for Nigerian DISCOs
 const METER_REGEX = /^\d{11,13}$/;
+
+function parseServiceList(r, key) {
+  const d = r.data?.data;
+  if (d && Array.isArray(d[key])) return d[key];
+  if (d && Array.isArray(d.results)) return d.results;
+  if (Array.isArray(d)) return d;
+  if (Array.isArray(r.data)) return r.data;
+  return [];
+}
+
+function getErrorMsg(err) {
+  const code = err.response?.data?.error?.code;
+  const msg = err.response?.data?.error?.message || err.response?.data?.message;
+  const MAP = {
+    INSUFFICIENT_FUNDS: '❌ Wallet balance too low. Please fund your wallet first.',
+    INVALID_PIN: '🔐 Wrong transaction PIN. Please try again.',
+    WALLET_LOCKED: '🔒 Your wallet is locked. Contact support.',
+    PIN_REQUIRED: '🔑 Set a transaction PIN first — go to Profile → Security.',
+    DUPLICATE_REQUEST: '⚠️ Duplicate transaction detected. Please wait.',
+    TRANSACTION_FAILED: '❌ Payment rejected by the electricity provider. Please try again.',
+    FETCH_FAILED: '⚠️ Could not load electricity billers right now.',
+  };
+  return MAP[code] || msg || 'Something went wrong. Please try again.';
+}
 
 function FieldError({ msg }) {
   if (!msg) return null;
@@ -28,21 +51,29 @@ export default function ElectricityPage() {
   const { user, refreshUser } = useAuth();
   const [billers, setBillers] = useState([]);
   const [billersLoading, setBillersLoading] = useState(true);
+  const [billersError, setBillersError] = useState(null);
   const [form, setForm] = useState({ provider: '', meter_number: '', meter_type: 'prepaid', amount: '' });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [showPin, setShowPin] = useState(false);
 
-  useEffect(() => {
+  const loadBillers = useCallback(() => {
     setBillersLoading(true);
+    setBillersError(null);
     getElectricityBillers()
       .then(r => {
-        const raw = r.data?.data;
-        setBillers(raw?.results || (Array.isArray(raw) ? raw : []));
+        if (r.data?.error?.code === 'FETCH_FAILED') {
+          setBillersError('Could not load electricity billers. Please retry.');
+          setBillers([]);
+        } else {
+          setBillers(parseServiceList(r, 'billers'));
+        }
       })
-      .catch(() => {})
+      .catch(() => { setBillersError('Could not load billers. Please retry.'); setBillers([]); })
       .finally(() => setBillersLoading(false));
   }, []);
+
+  useEffect(() => { loadBillers(); }, [loadBillers]);
 
   const setField = (k, v) => {
     setForm(p => ({ ...p, [k]: v }));
@@ -79,10 +110,10 @@ export default function ElectricityPage() {
     setLoading(true);
     try {
       await purchaseElectricity({
-        provider: form.provider,       // API confirmed field: "provider" (not "biller")
+        provider: form.provider,
         meter_number: form.meter_number.trim(),
         meter_type: form.meter_type,
-        amount: form.amount,
+        amount: parseFloat(form.amount),
         pin,
       });
       toast.success(`₦${parseFloat(form.amount).toLocaleString()} electricity units purchased! ✓`);
@@ -90,9 +121,9 @@ export default function ElectricityPage() {
       setShowPin(false);
       refreshUser();
     } catch (err) {
-      const e = err.response?.data;
-      toast.error(e?.error?.message || e?.message || 'Purchase failed');
-      if (e?.error?.code === 'INSUFFICIENT_FUNDS') setErrors(p => ({ ...p, amount: 'Insufficient wallet balance' }));
+      toast.error(getErrorMsg(err));
+      const code = err.response?.data?.error?.code;
+      if (code === 'INSUFFICIENT_FUNDS') setErrors(p => ({ ...p, amount: 'Insufficient wallet balance' }));
     } finally { setLoading(false); }
   };
 
@@ -104,8 +135,7 @@ export default function ElectricityPage() {
       <div className="page-subtitle">Buy prepaid or postpaid units for any Nigerian DISCO — paid from your wallet</div>
 
       <div className="service-form-card">
-
-        {/* DISCO — loaded from backend */}
+        {/* DISCO */}
         <div className="form-group">
           <label className="form-label">
             Select Electricity Company (DISCO)
@@ -115,6 +145,12 @@ export default function ElectricityPage() {
             <div style={{ textAlign: 'center', padding: 16 }}>
               <div className="spinner spinner-dark" style={{ margin: '0 auto' }} />
             </div>
+          ) : billersError ? (
+            <div className="fetch-error-box">
+              <AlertCircle size={16} />
+              <span>{billersError}</span>
+              <button className="retry-btn" onClick={loadBillers}><RefreshCw size={12} /> Retry</button>
+            </div>
           ) : (
             <select
               className={`form-input ${errors.provider ? 'input-error' : ''}`}
@@ -122,8 +158,8 @@ export default function ElectricityPage() {
               onChange={e => setField('provider', e.target.value)}
             >
               <option value="">-- Select your distributor --</option>
-              {billers.filter(b => b.is_active).map(b => (
-                <option key={b.id} value={b.code}>{b.name}</option>
+              {billers.filter(b => b.is_active !== false).map(b => (
+                <option key={b.id || b.code} value={b.code}>{b.name}</option>
               ))}
             </select>
           )}
@@ -151,9 +187,7 @@ export default function ElectricityPage() {
           <input
             className={`form-input ${errors.meter_number ? 'input-error' : ''}`}
             placeholder="11–13 digit meter number"
-            value={form.meter_number}
-            inputMode="numeric"
-            maxLength={13}
+            value={form.meter_number} inputMode="numeric" maxLength={13}
             onChange={e => setField('meter_number', e.target.value.replace(/\D/g, ''))}
           />
           <FieldError msg={errors.meter_number} />
@@ -183,19 +217,17 @@ export default function ElectricityPage() {
           <FieldError msg={errors.amount} />
         </div>
 
-        {/* Summary */}
         {form.provider && form.meter_number && form.amount && Object.keys(errors).length === 0 && (
           <div className="summary-box">
-            <div className="summary-row"><span>DISCO</span><span>{selectedBiller?.name || form.provider.toUpperCase()}</span></div>
+            <div className="summary-row"><span>DISCO</span><span>{selectedBiller?.name || form.provider}</span></div>
             <div className="summary-row"><span>Meter</span><span>{form.meter_number} ({form.meter_type})</span></div>
             <div className="summary-row"><span>Amount</span><span><strong>₦{parseFloat(form.amount || 0).toLocaleString()}</strong></span></div>
           </div>
         )}
 
-        <button className="btn btn-primary btn-full btn-lg" onClick={handleBuy} disabled={loading}>
+        <button className="btn btn-primary btn-full btn-lg" onClick={handleBuy} disabled={loading || billersLoading}>
           {loading ? <span className="spinner" /> : <><Zap size={16} /> Pay Now</>}
         </button>
-
         <p style={{ fontSize: 12, color: 'var(--gray-500)', textAlign: 'center', marginTop: 12 }}>
           Wallet balance: ₦{parseFloat(user?.wallet_balance || 0).toLocaleString()} · Deducted instantly
         </p>
