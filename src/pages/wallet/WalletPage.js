@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { getWallet, fundWallet, getWalletLedger } from '../../api/wallet';
+import { getWallet, fundWallet, getWalletLedger, getFundingStatus } from '../../api/wallet';
 import toast from 'react-hot-toast';
 import { Wallet, ArrowDownCircle, ArrowUpCircle, Plus, RefreshCw, AlertCircle } from 'lucide-react';
 import './Wallet.css';
@@ -79,21 +79,49 @@ export default function WalletPage() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
-  // Handle Flutterwave redirect callback
+  // Handle Flutterwave redirect callback + poll funding status (API doc 3.a)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const status = params.get('status');
     const txRef = params.get('tx_ref');
-    if (txRef) {
-      if (status === 'successful') {
-        toast.success('Wallet funded successfully! 🎉');
-        loadData();
-      } else if (status === 'cancelled') {
-        toast.error('Payment was cancelled.');
-      } else if (status === 'failed') {
-        toast.error('Payment failed. Please try again.');
-      }
-      window.history.replaceState({}, '', window.location.pathname);
+    if (!txRef) return;
+    window.history.replaceState({}, '', window.location.pathname);
+
+    if (status === 'cancelled') { toast.error('Payment was cancelled.'); return; }
+    if (status === 'failed')    { toast.error('Payment failed. Please try again.'); return; }
+
+    // status === 'successful' — poll backend to confirm wallet was credited
+    if (status === 'successful') {
+      toast.loading('Verifying payment…', { id: 'fund-poll' });
+      let attempts = 0;
+      const maxAttempts = 12; // poll up to ~60 seconds
+      const interval = setInterval(async () => {
+        attempts++;
+        try {
+          const r = await getFundingStatus(txRef);
+          const fundStatus = r.data?.data?.funding?.status;
+          if (fundStatus === 'completed') {
+            clearInterval(interval);
+            toast.success('Wallet funded successfully! 🎉', { id: 'fund-poll' });
+            loadData();
+          } else if (fundStatus === 'failed') {
+            clearInterval(interval);
+            toast.error('Payment verification failed. Contact support.', { id: 'fund-poll' });
+          } else if (attempts >= maxAttempts) {
+            clearInterval(interval);
+            toast('Payment received — balance may take a moment to update.', { id: 'fund-poll', icon: 'ℹ️' });
+            loadData();
+          }
+        } catch {
+          if (attempts >= maxAttempts) {
+            clearInterval(interval);
+            toast('Could not verify payment. Check your balance shortly.', { id: 'fund-poll', icon: 'ℹ️' });
+            loadData();
+          }
+        }
+      }, 5000); // poll every 5 seconds
+      // Cleanup if component unmounts
+      return () => clearInterval(interval);
     }
   }, [loadData]);
 
