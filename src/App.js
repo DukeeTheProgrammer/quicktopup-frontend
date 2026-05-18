@@ -18,6 +18,7 @@ import TransactionsPage from './pages/transactions/TransactionsPage';
 import NotificationsPage from './pages/notifications/NotificationsPage';
 import ProfilePage from './pages/profile/ProfilePage';
 import Layout from './components/Layout';
+import CustomerSupport from './components/CustomerSupport';
 
 const PrivateRoute = ({ children }) => {
   const { token } = useAuth();
@@ -36,21 +37,21 @@ function AppRoutes() {
       <Route path="/" element={<LandingPage />} />
 
       {/* Auth — only for unauthenticated users */}
-      <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-      <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+      <Route path="/login"          element={<PublicRoute><LoginPage /></PublicRoute>} />
+      <Route path="/register"       element={<PublicRoute><RegisterPage /></PublicRoute>} />
       <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
-      <Route path="/reset-password" element={<PublicRoute><ResetPasswordPage /></PublicRoute>} />
+      <Route path="/reset-password"  element={<PublicRoute><ResetPasswordPage /></PublicRoute>} />
 
       {/* App — require login */}
-      <Route path="/dashboard" element={<PrivateRoute><Layout><DashboardPage /></Layout></PrivateRoute>} />
-      <Route path="/airtime" element={<PrivateRoute><Layout><AirtimePage /></Layout></PrivateRoute>} />
-      <Route path="/data" element={<PrivateRoute><Layout><DataPage /></Layout></PrivateRoute>} />
-      <Route path="/cable" element={<PrivateRoute><Layout><CablePage /></Layout></PrivateRoute>} />
-      <Route path="/electricity" element={<PrivateRoute><Layout><ElectricityPage /></Layout></PrivateRoute>} />
-      <Route path="/wallet" element={<PrivateRoute><Layout><WalletPage /></Layout></PrivateRoute>} />
+      <Route path="/dashboard"    element={<PrivateRoute><Layout><DashboardPage /></Layout></PrivateRoute>} />
+      <Route path="/airtime"      element={<PrivateRoute><Layout><AirtimePage /></Layout></PrivateRoute>} />
+      <Route path="/data"         element={<PrivateRoute><Layout><DataPage /></Layout></PrivateRoute>} />
+      <Route path="/cable"        element={<PrivateRoute><Layout><CablePage /></Layout></PrivateRoute>} />
+      <Route path="/electricity"  element={<PrivateRoute><Layout><ElectricityPage /></Layout></PrivateRoute>} />
+      <Route path="/wallet"       element={<PrivateRoute><Layout><WalletPage /></Layout></PrivateRoute>} />
       <Route path="/transactions" element={<PrivateRoute><Layout><TransactionsPage /></Layout></PrivateRoute>} />
       <Route path="/notifications" element={<PrivateRoute><Layout><NotificationsPage /></Layout></PrivateRoute>} />
-      <Route path="/profile" element={<PrivateRoute><Layout><ProfilePage /></Layout></PrivateRoute>} />
+      <Route path="/profile"      element={<PrivateRoute><Layout><ProfilePage /></Layout></PrivateRoute>} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
@@ -64,6 +65,8 @@ function App() {
       <BrowserRouter>
         <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
         <AppRoutes />
+        {/* Customer support widget — global overlay, works on every page */}
+        <CustomerSupport />
       </BrowserRouter>
     </AuthProvider>
   );
