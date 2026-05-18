@@ -14,7 +14,7 @@ const NET_COLORS = {
 };
 const COUNTRIES = [
   { code: 'NG', label: '🇳🇬 Nigeria', prefix: '+234', currency: '₦', minAmount: 50,
-    placeholder: '+2348012345678', phoneRegex: /^\+234[7-9][01]\d{8}$/ },
+    placeholder: '08012345678 or +2348012345678' },
   { code: 'GH', label: '🇬🇭 Ghana', prefix: '+233', currency: 'GH₵', minAmount: 1,
     placeholder: '+233241234567', phoneRegex: /^\+233[235]\d{8}$/ },
 ];
@@ -113,8 +113,11 @@ export default function AirtimePage() {
     if (!form.network) e.network = 'Please select a network';
     if (!form.phone.trim()) {
       e.phone = 'Phone number is required';
-    } else if (!selectedCountry.phoneRegex.test(form.phone.trim())) {
-      e.phone = `Enter a valid ${selectedCountry.label} number (e.g. ${selectedCountry.placeholder})`;
+    } else if (country === 'GH' && selectedCountry.phoneRegex && !selectedCountry.phoneRegex.test(form.phone.trim())) {
+      // Ghana regex still validated; Nigeria format accepted by backend as-is
+      e.phone = `Enter a valid Ghana number (e.g. ${selectedCountry.placeholder})`;
+    } else if (form.phone.trim().length < 7) {
+      e.phone = 'Phone number is too short';
     }
     const amt = parseFloat(form.amount);
     if (!form.amount || isNaN(amt)) {
@@ -215,7 +218,7 @@ export default function AirtimePage() {
             value={form.phone} onChange={handlePhoneChange} />
           <FieldError msg={errors.phone} />
           <small style={{ color: 'var(--gray-400)', fontSize: 12, marginTop: 4, display: 'block' }}>
-            Must start with {selectedCountry.prefix} (international format)
+            Nigerian numbers: local (08012...) or international (+23480...) format accepted
           </small>
         </div>
 
