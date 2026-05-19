@@ -5,11 +5,15 @@
       "destination": "https://unmade-backboned-agreeably.ngrok-free.dev/api/:path*"
     },
     {
+      "source": "/admin",
+      "destination": "https://unmade-backboned-agreeably.ngrok-free.dev/admin/"
+    },
+    {
       "source": "/admin/:path*",
       "destination": "https://unmade-backboned-agreeably.ngrok-free.dev/admin/:path*"
     },
     {
-      "source": "/((?!admin|api).*)",
+      "source": "/:path*",
       "destination": "/index.html"
     }
   ]
