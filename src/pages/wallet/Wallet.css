@@ -15,7 +15,7 @@
 
 .wallet-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
 .wstat-card {
-  background: white; border-radius: 14px; padding: 18px 14px;
+  background: var(--bg-card); border-radius: 14px; padding: 18px 14px;
   display: flex; align-items: center; gap: 12px;
   box-shadow: var(--shadow-sm);
 }
@@ -27,7 +27,7 @@
 
 .wallet-tabs { display: flex; gap: 4px; background: var(--gray-200); border-radius: 12px; padding: 4px; margin-bottom: 16px; }
 .tab-btn { flex: 1; padding: 9px; border-radius: 9px; border: none; background: none; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--gray-500); transition: all 0.2s; }
-.tab-btn.active { background: white; color: var(--text); box-shadow: var(--shadow-sm); }
+.tab-btn.active { background: var(--bg-card); color: var(--text); box-shadow: var(--shadow-sm); }
 
 .detail-row {
   display: flex; justify-content: space-between; align-items: center;
@@ -38,7 +38,7 @@
 .detail-row span:first-child { color: var(--gray-500); }
 .detail-row span:last-child { font-weight: 600; }
 
-.ledger-list { background: white; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-sm); }
+.ledger-list { background: var(--bg-card); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-sm); }
 .ledger-row { display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-bottom: 1px solid var(--gray-100); }
 .ledger-row:last-child { border-bottom: none; }
 
