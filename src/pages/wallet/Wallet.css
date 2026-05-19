@@ -56,4 +56,38 @@
 .ledger-amount.debit { color: var(--danger); }
 .ledger-bal { font-size: 11px; color: var(--gray-500); }
 
-@media (max-width: 600px) { .wallet-stats-grid { grid-template-columns: 1fr 1fr; } }
+/* ── Wallet responsive ── */
+@media (max-width: 768px) {
+  .wallet-bal-card { padding: 24px 20px; border-radius: 16px; }
+  .wb-amount { font-size: 32px; }
+  .wallet-stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .wstat-card { padding: 14px 12px; gap: 8px; }
+}
+@media (max-width: 480px) {
+  .wallet-bal-card { padding: 20px 16px; }
+  .wb-amount { font-size: 28px; }
+  .wallet-stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .wstat-val { font-size: 14px; }
+  .ledger-row { padding: 12px 14px; gap: 10px; }
+  .ledger-amount { font-size: 13px; }
+  .wallet-tabs { gap: 2px; }
+  .tab-btn { padding: 8px 4px; font-size: 13px; }
+}
+@media (max-width: 360px) {
+  .wb-amount { font-size: 24px; }
+  .wallet-stats-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Wallet animations ── */
+.wallet-bal-card { animation: slideInUp 0.5s cubic-bezier(.22,1,.36,1) both; }
+.wallet-stats-grid { animation: slideInUp 0.5s cubic-bezier(.22,1,.36,1) 0.08s both; }
+.wstat-card {
+  transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s;
+}
+.wstat-card:hover { transform: translateY(-4px); box-shadow: 0 10px 28px rgba(0,185,107,.12); }
+.ledger-row { transition: background 0.15s, transform 0.15s; }
+.ledger-row:hover { background: var(--gray-100); transform: translateX(3px); }
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
