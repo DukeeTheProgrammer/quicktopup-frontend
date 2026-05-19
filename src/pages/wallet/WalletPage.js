@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { getWallet, fundWallet, getWalletLedger, getFundingStatus } from '../../api/wallet';
 import toast from 'react-hot-toast';
-import { Wallet, ArrowDownCircle, ArrowUpCircle, Plus, RefreshCw, AlertCircle } from 'lucide-react';
+import { Wallet, ArrowDownCircle, ArrowUpCircle, Plus, RefreshCw, AlertCircle, CreditCard, Building2, Smartphone, DollarSign } from 'lucide-react';
 import './Wallet.css';
 
 const FUND_PRESETS = [1000, 2000, 5000, 10000, 20000, 50000];
 const PAYMENT_METHODS = [
-  { value: 'card', label: '💳 Card', desc: 'Visa / Mastercard / Verve' },
-  { value: 'bank_transfer', label: '🏦 Bank Transfer', desc: 'Direct bank transfer' },
-  { value: 'ussd', label: '📱 USSD', desc: 'Dial code on your phone' },
-  { value: 'mobile_money', label: '💰 Mobile Money', desc: 'MTN MoMo, etc.' },
+  { value: 'card', label: 'Card', desc: 'Visa / Mastercard / Verve', icon: CreditCard },
+  { value: 'bank_transfer', label: 'Bank Transfer', desc: 'Direct bank transfer', icon: Building2 },
+  { value: 'ussd', label: 'USSD', desc: 'Dial code on your phone', icon: Smartphone },
+  { value: 'mobile_money', label: 'Mobile Money', desc: 'MTN MoMo, etc.', icon: DollarSign },
 ];
 
 function parseError(err) {
@@ -102,20 +102,20 @@ export default function WalletPage() {
           const fundStatus = r.data?.data?.funding?.status;
           if (fundStatus === 'completed') {
             clearInterval(interval);
-            toast.success('Wallet funded successfully! 🎉', { id: 'fund-poll' });
+            toast.success('Wallet funded successfully!', { id: 'fund-poll' });
             loadData();
           } else if (fundStatus === 'failed') {
             clearInterval(interval);
             toast.error('Payment verification failed. Contact support.', { id: 'fund-poll' });
           } else if (attempts >= maxAttempts) {
             clearInterval(interval);
-            toast('Payment received — balance may take a moment to update.', { id: 'fund-poll', icon: 'ℹ️' });
+            toast('Payment received — balance may take a moment to update.', { id: 'fund-poll' });
             loadData();
           }
         } catch {
           if (attempts >= maxAttempts) {
             clearInterval(interval);
-            toast('Could not verify payment. Check your balance shortly.', { id: 'fund-poll', icon: 'ℹ️' });
+            toast('Could not verify payment. Check your balance shortly.', { id: 'fund-poll' });
             loadData();
           }
         }
@@ -146,7 +146,7 @@ export default function WalletPage() {
       if (fee > 0) {
         toast.success(
           `Processing fee: ₦${fee.toLocaleString()} · You'll pay ₦${total.toLocaleString()} total`,
-          { duration: 5000, icon: 'ℹ️' }
+          { duration: 5000 }
         );
       }
       const paymentLink = data?.payment_link;
@@ -162,8 +162,8 @@ export default function WalletPage() {
       const errCode = err.response?.data?.error?.code;
       const errMsg = err.response?.data?.error?.message || parseError(err);
       const MAP = {
-        WALLET_LOCKED: '🔒 Your wallet is locked. Contact support.',
-        PAYMENT_INIT_FAILED: '❌ Payment initiation failed. Try a different payment method.',
+        WALLET_LOCKED: 'Your wallet is locked. Contact support.',
+        PAYMENT_INIT_FAILED: 'Payment initiation failed. Try a different payment method.',
       };
       toast.error(MAP[errCode] || errMsg);
     } finally {
@@ -217,7 +217,7 @@ export default function WalletPage() {
           </button>
           {wallet?.is_locked && (
             <span style={{ background: '#fed7d7', color: '#c53030', padding: '8px 14px', borderRadius: 8, fontSize: 13, fontWeight: 600 }}>
-              🔒 Wallet Locked
+              <Lock size={14} /> Wallet Locked
             </span>
           )}
         </div>
@@ -258,7 +258,7 @@ export default function WalletPage() {
         <div className="card">
           <h3 style={{ fontWeight: 700, marginBottom: 16 }}>Wallet Details</h3>
           <div className="detail-row"><span>Status</span><span className={`badge ${wallet?.is_active ? 'badge-success' : 'badge-danger'}`}>{wallet?.is_active ? 'Active' : 'Inactive'}</span></div>
-          <div className="detail-row"><span>Lock Status</span><span className={`badge ${wallet?.is_locked ? 'badge-danger' : 'badge-success'}`}>{wallet?.is_locked ? '🔒 Locked' : '🔓 Unlocked'}</span></div>
+          <div className="detail-row"><span>Lock Status</span><span className={`badge ${wallet?.is_locked ? 'badge-danger' : 'badge-success'}`} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>{wallet?.is_locked ? <><Lock size={12} /> Locked</> : <>Unlocked</>}</span></div>
           <div className="detail-row"><span>Daily Limit</span><span>₦{parseFloat(wallet?.daily_limit || 0).toLocaleString()}</span></div>
           <div className="detail-row"><span>Monthly Limit</span><span>₦{parseFloat(wallet?.monthly_limit || 0).toLocaleString()}</span></div>
           <div className="detail-row"><span>Reserved</span><span>₦{parseFloat(wallet?.reserved_balance || 0).toLocaleString()}</span></div>
@@ -343,6 +343,7 @@ export default function WalletPage() {
                       checked={payMethod === m.value}
                       onChange={() => setPayMethod(m.value)}
                       style={{ accentColor: 'var(--green)' }} />
+                    <m.icon size={18} style={{ color: payMethod === m.value ? 'var(--green)' : 'var(--gray-400)' }} />
                     <div>
                       <div style={{ fontWeight: 600, fontSize: 14 }}>{m.label}</div>
                       <div style={{ fontSize: 12, color: 'var(--gray-500)' }}>{m.desc}</div>

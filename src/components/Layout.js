@@ -6,7 +6,7 @@ import { logout } from '../api/auth';
 import toast from 'react-hot-toast';
 import {
   LayoutDashboard, Phone, Wifi, Tv, Zap, Wallet, ClipboardList,
-  Bell, User, LogOut, Menu, X, ChevronRight
+  Bell, User, LogOut, Menu, X, ChevronRight, Sun, Moon
 } from 'lucide-react';
 import './Layout.css';
 
@@ -75,7 +75,7 @@ export default function Layout({ children }) {
             </div>
           </div>
           <div className="theme-toggle-wrap" style={{ marginBottom: 10, paddingLeft: 2 }}>
-            <span className="theme-icon">{theme === 'dark' ? '🌙' : '☀️'}</span>
+            {theme === 'dark' ? <Moon size={14} /> : <Sun size={14} />}
             <span style={{ flex: 1, fontSize: 13 }}>{theme === 'dark' ? 'Dark mode' : 'Light mode'}</span>
             <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme" />
           </div>
@@ -98,7 +98,7 @@ export default function Layout({ children }) {
               title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
               aria-label="Toggle theme"
             >
-              {theme === 'dark' ? '☀️' : '🌙'}
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             </button>
             <div className="wallet-chip">
               <Wallet size={14} />

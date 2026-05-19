@@ -1,34 +1,34 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTheme } from '../../context/ThemeContext';
 import { Link } from 'react-router-dom';
-import { Zap, Shield, CheckCircle, Menu, X } from 'lucide-react';
+import { Zap, Shield, CheckCircle, Menu, X, Phone, Wifi, Tv, Bolt, UserPlus, Wallet, ShoppingCart, Rocket, Lock, ShieldCheck, KeyRound, LineChart, Search, Bell, Sun, Moon } from 'lucide-react';
 import './LandingPage.css';
 
 /* ─── Data ─── */
 const SERVICES = [
   {
-    icon: '📱', gradient: 'linear-gradient(135deg,#00b96b,#00d97e)',
+    icon: Phone, gradient: 'linear-gradient(135deg,#00b96b,#00d97e)',
     title: 'Airtime Top-Up',
     desc: 'Recharge any Nigerian or Ghanaian number across all networks in under 5 seconds.',
     badge: 'Most Popular',
     link: '/register',
   },
   {
-    icon: '📶', gradient: 'linear-gradient(135deg,#4299e1,#63b3ed)',
+    icon: Wifi, gradient: 'linear-gradient(135deg,#4299e1,#63b3ed)',
     title: 'Data Bundles',
     desc: '50+ plans from 100MB to 100GB+ across all networks. Daily, weekly, and monthly.',
     badge: '50+ Plans',
     link: '/register',
   },
   {
-    icon: '📺', gradient: 'linear-gradient(135deg,#9f7aea,#b794f4)',
+    icon: Tv, gradient: 'linear-gradient(135deg,#9f7aea,#b794f4)',
     title: 'Cable TV',
     desc: 'DSTV, GOtv, Startimes & Showmax — renew any bouquet instantly. IUC validated.',
     badge: '4 Providers',
     link: '/register',
   },
   {
-    icon: '⚡', gradient: 'linear-gradient(135deg,#f6ad55,#fc8181)',
+    icon: Bolt, gradient: 'linear-gradient(135deg,#f6ad55,#fc8181)',
     title: 'Electricity',
     desc: 'All 11 Nigerian DISCOs supported. Prepaid tokens generated in real-time.',
     badge: '11 DISCOs',
@@ -37,29 +37,29 @@ const SERVICES = [
 ];
 
 const NETWORKS = [
-  { name: 'MTN', full: 'MTN Nigeria', color: '#f6d800', flag: '🇳🇬' },
-  { name: 'Airtel', full: 'Airtel Nigeria', color: '#e4002b', flag: '🇳🇬' },
-  { name: 'Glo', full: 'Glo Mobile', color: '#00b140', flag: '🇳🇬' },
-  { name: '9Mobile', full: '9Mobile', color: '#006b3f', flag: '🇳🇬' },
-  { name: 'MTN GH', full: 'MTN Ghana', color: '#f6d800', flag: '🇬🇭' },
-  { name: 'Vodafone', full: 'Vodafone Ghana', color: '#e4002b', flag: '🇬🇭' },
-  { name: 'AirtelTigo', full: 'AirtelTigo Ghana', color: '#e07b39', flag: '🇬🇭' },
+  { name: 'MTN', full: 'MTN Nigeria', color: '#f6d800', flag: 'NG' },
+  { name: 'Airtel', full: 'Airtel Nigeria', color: '#e4002b', flag: 'NG' },
+  { name: 'Glo', full: 'Glo Mobile', color: '#00b140', flag: 'NG' },
+  { name: '9Mobile', full: '9Mobile', color: '#006b3f', flag: 'NG' },
+  { name: 'MTN GH', full: 'MTN Ghana', color: '#f6d800', flag: 'GH' },
+  { name: 'Vodafone', full: 'Vodafone Ghana', color: '#e4002b', flag: 'GH' },
+  { name: 'AirtelTigo', full: 'AirtelTigo Ghana', color: '#e07b39', flag: 'GH' },
 ];
 
 const STEPS = [
-  { num: '01', icon: '✍️', title: 'Create Account', desc: 'Sign up in 60 seconds — email and phone, that\'s it.' },
-  { num: '02', icon: '💳', title: 'Fund Wallet', desc: 'Bank transfer or card. Balance available instantly.' },
-  { num: '03', icon: '🛒', title: 'Pick a Service', desc: 'Airtime, data, cable, or electricity. Enter details + PIN.' },
-  { num: '04', icon: '🚀', title: 'Done!', desc: 'Transaction processed. Receipt in your inbox.' },
+  { num: '01', icon: UserPlus, title: 'Create Account', desc: 'Sign up in 60 seconds — email and phone, that\'s it.' },
+  { num: '02', icon: Wallet, title: 'Fund Wallet', desc: 'Bank transfer or card. Balance available instantly.' },
+  { num: '03', icon: ShoppingCart, title: 'Pick a Service', desc: 'Airtime, data, cable, or electricity. Enter details + PIN.' },
+  { num: '04', icon: Rocket, title: 'Done!', desc: 'Transaction processed. Receipt in your inbox.' },
 ];
 
 const SECURITY = [
-  { icon: '🔒', title: '4-Digit PIN', desc: 'Every purchase needs your PIN. Password alone can\'t authorise transactions.' },
-  { icon: '🛡️', title: 'Token Auth', desc: 'Bearer tokens on all sessions. Invalidated instantly on logout.' },
-  { icon: '⚡', title: 'Idempotency', desc: 'Unique keys per request — tap "Buy" twice, charged once.' },
-  { icon: '📊', title: 'Spend Limits', desc: '₦50k daily / ₦200k monthly caps protect against unauthorised use.' },
-  { icon: '🔍', title: 'Validation', desc: 'Phone format, amount range, required fields — all checked server-side.' },
-  { icon: '🔔', title: 'Alerts', desc: 'Instant email + in-app notification on every transaction.' },
+  { icon: Lock, title: '4-Digit PIN', desc: 'Every purchase needs your PIN. Password alone can\'t authorise transactions.' },
+  { icon: ShieldCheck, title: 'Token Auth', desc: 'Bearer tokens on all sessions. Invalidated instantly on logout.' },
+  { icon: KeyRound, title: 'Idempotency', desc: 'Unique keys per request — tap "Buy" twice, charged once.' },
+  { icon: LineChart, title: 'Spend Limits', desc: '₦50k daily / ₦200k monthly caps protect against unauthorised use.' },
+  { icon: Search, title: 'Validation', desc: 'Phone format, amount range, required fields — all checked server-side.' },
+  { icon: Bell, title: 'Alerts', desc: 'Instant email + in-app notification on every transaction.' },
 ];
 
 const FAQS = [
@@ -202,7 +202,7 @@ export default function LandingPage() {
           <a href="#faq" onClick={() => setNavOpen(false)}>FAQ</a>
           <div className="lp-nav-cta-mobile">
             <button className="lp-theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
-              {theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode'}
+              {theme === 'dark' ? <><Sun size={16} /> Light Mode</> : <><Moon size={16} /> Dark Mode</>}
             </button>
             <Link to="/login" className="btn-outline" onClick={() => setNavOpen(false)}>Log In</Link>
             <Link to="/register" className="btn-solid" onClick={() => setNavOpen(false)}>Get Started</Link>
@@ -210,7 +210,7 @@ export default function LandingPage() {
         </div>
         <div className="lp-nav-cta lp-nav-cta-desktop">
           <button className="lp-theme-toggle" onClick={toggleTheme} aria-label="Toggle theme" title={theme === 'dark' ? 'Light mode' : 'Dark mode'}>
-            {theme === 'dark' ? '☀️' : '🌙'}
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           </button>
           <Link to="/login" className="btn-outline">Log In</Link>
           <Link to="/register" className="btn-solid">Get Started</Link>
@@ -274,9 +274,9 @@ export default function LandingPage() {
               style={{ '--i': i }}
             >
               <div className="lp-svc-top">
-                <div className="lp-service-icon" style={{ background: s.gradient }}>
-                  {s.icon}
-                </div>
+              <div className="lp-service-icon" style={{ background: s.gradient }}>
+                <s.icon size={32} color="white" />
+              </div>
                 <span className="lp-svc-badge">{s.badge}</span>
               </div>
               <h3>{s.title}</h3>
@@ -304,7 +304,7 @@ export default function LandingPage() {
               style={{ '--i': i }}
             >
               <span className="lp-network-dot" style={{ background: n.color }} />
-              {n.flag} {n.full}
+              <span className="network-flag-badge">{n.flag}</span> {n.full}
               <CheckCircle size={15} color="#00b96b" />
             </div>
           ))}
@@ -325,7 +325,7 @@ export default function LandingPage() {
               className={`lp-step ${stepsIn ? 'fade-up-in' : 'fade-up-out'}`}
               style={{ '--i': i }}
             >
-              <div className="lp-step-icon">{s.icon}</div>
+              <div className="lp-step-icon"><s.icon size={28} /></div>
               <div className="lp-step-num-badge">{s.num}</div>
               <h3>{s.title}</h3>
               <p>{s.desc}</p>
@@ -351,7 +351,7 @@ export default function LandingPage() {
               className={`lp-security-card ${secIn ? 'fade-up-in' : 'fade-up-out'}`}
               style={{ '--i': i }}
             >
-              <div className="sec-icon">{s.icon}</div>
+              <div className="sec-icon"><s.icon size={28} /></div>
               <h3>{s.title}</h3>
               <p>{s.desc}</p>
             </div>

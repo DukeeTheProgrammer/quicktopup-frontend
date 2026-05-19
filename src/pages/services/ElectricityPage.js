@@ -3,14 +3,14 @@ import { getElectricityBillers } from '../../api/services';
 import { purchaseElectricity } from '../../api/transactions';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
-import { Zap, AlertCircle, RefreshCw } from 'lucide-react';
+import { Zap, AlertCircle, RefreshCw, XCircle, Lock, KeyRound, AlertTriangle, ClipboardList } from 'lucide-react';
 import PinModal from './PinModal';
 import './ServicePage.css';
 
 const PRESETS = [1000, 2000, 5000, 10000, 20000, 50000];
 const METER_TYPES = [
-  { value: 'prepaid', label: '⚡ Prepaid' },
-  { value: 'postpaid', label: '📋 Postpaid' },
+  { value: 'prepaid', label: 'Prepaid' },
+  { value: 'postpaid', label: 'Postpaid' },
 ];
 const METER_REGEX = /^\d{11,13}$/;
 
@@ -27,13 +27,13 @@ function getErrorMsg(err) {
   const code = err.response?.data?.error?.code;
   const msg = err.response?.data?.error?.message || err.response?.data?.message;
   const MAP = {
-    INSUFFICIENT_FUNDS: '❌ Wallet balance too low. Please fund your wallet first.',
-    INVALID_PIN: '🔐 Wrong transaction PIN. Please try again.',
-    WALLET_LOCKED: '🔒 Your wallet is locked. Contact support.',
-    PIN_REQUIRED: '🔑 Set a transaction PIN first — go to Profile → Security.',
-    DUPLICATE_REQUEST: '⚠️ Duplicate transaction detected. Please wait.',
-    TRANSACTION_FAILED: '❌ Payment rejected by the electricity provider. Please try again.',
-    FETCH_FAILED: '⚠️ Could not load electricity billers right now.',
+    INSUFFICIENT_FUNDS: 'Wallet balance too low. Please fund your wallet first.',
+    INVALID_PIN: 'Wrong transaction PIN. Please try again.',
+    WALLET_LOCKED: 'Your wallet is locked. Contact support.',
+    PIN_REQUIRED: 'Set a transaction PIN first — go to Profile → Security.',
+    DUPLICATE_REQUEST: 'Duplicate transaction detected. Please wait.',
+    TRANSACTION_FAILED: 'Payment rejected by the electricity provider. Please try again.',
+    FETCH_FAILED: 'Could not load electricity billers right now.',
   };
   return MAP[code] || msg || 'Something went wrong. Please try again.';
 }
@@ -116,7 +116,7 @@ export default function ElectricityPage() {
         amount: parseFloat(form.amount),
         pin,
       });
-      toast.success(`₦${parseFloat(form.amount).toLocaleString()} electricity units purchased! ✓`);
+      toast.success(`₦${parseFloat(form.amount).toLocaleString()} electricity units purchased`);
       setForm(p => ({ ...p, meter_number: '', amount: '' }));
       setShowPin(false);
       refreshUser();

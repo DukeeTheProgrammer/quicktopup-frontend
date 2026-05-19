@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { getWallet } from '../../api/wallet';
 import { getTransactions } from '../../api/transactions';
 import { useAuth } from '../../context/AuthContext';
-import { Phone, Wifi, Tv, Zap, Plus, ArrowUpRight, ArrowDownLeft, RefreshCw, Eye, EyeOff } from 'lucide-react';
+import { Phone, Wifi, Tv, Zap, Plus, ArrowUpRight, ArrowDownLeft, RefreshCw, Eye, EyeOff, Hand } from 'lucide-react';
 import './Dashboard.css';
 
 const services = [
@@ -45,7 +45,7 @@ export default function DashboardPage() {
   return (
     <div className="dashboard">
       <div className="dash-greeting">
-        Good {getGreeting()}, <span>{user?.first_name}! 👋</span>
+        Good {getGreeting()}, <span>{user?.first_name}!</span> <Hand size={18} style={{ display: 'inline', verticalAlign: 'middle' }} />
       </div>
 
       {/* Wallet card */}

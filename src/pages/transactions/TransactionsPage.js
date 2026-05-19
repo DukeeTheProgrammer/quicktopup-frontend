@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { getTransactions } from '../../api/transactions';
-import { ClipboardList, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ClipboardList, Search, ChevronLeft, ChevronRight, Phone, Wifi, Tv, Zap, CreditCard } from 'lucide-react';
 
 const STATUS_MAP = { success: 'badge-success', failed: 'badge-danger', pending: 'badge-warning', processing: 'badge-info' };
-const SERVICE_ICONS = { airtime: '📱', data: '📶', cable: '📺', electricity: '⚡' };
+const SERVICE_ICONS = { airtime: Phone, data: Wifi, cable: Tv, electricity: Zap };
 
 const PAGE_SIZE = 20;
 
@@ -114,7 +114,12 @@ export default function TransactionsPage() {
         <div style={{ background: 'var(--bg-card)', borderRadius: 16, overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
           {txns.map(txn => (
             <div key={txn.id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 20px', borderBottom: '1px solid var(--gray-100)' }}>
-              <div style={{ fontSize: 24, flexShrink: 0 }}>{SERVICE_ICONS[txn.service_type] || '💳'}</div>
+              <div style={{ flexShrink: 0 }}>
+                {(() => {
+                  const Icon = SERVICE_ICONS[txn.service_type] || CreditCard;
+                  return <Icon size={20} style={{ color: 'var(--gray-500)' }} />;
+                })()}
+              </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 600, fontSize: 14 }}>
                   {txn.service_type?.charAt(0).toUpperCase() + txn.service_type?.slice(1)}

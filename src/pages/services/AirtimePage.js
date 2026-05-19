@@ -4,7 +4,7 @@ import { purchaseAirtime } from '../../api/transactions';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import PinModal from './PinModal';
-import { Phone, AlertCircle, RefreshCw } from 'lucide-react';
+import { Phone, AlertCircle, RefreshCw, XCircle, Lock, KeyRound, AlertTriangle } from 'lucide-react';
 import './ServicePage.css';
 
 const NET_COLORS = {
@@ -13,9 +13,9 @@ const NET_COLORS = {
   VODAFONE: '#e53e3e', AIRTELTIGO: '#e53e3e',
 };
 const COUNTRIES = [
-  { code: 'NG', label: '🇳🇬 Nigeria', prefix: '+234', currency: '₦', minAmount: 50,
+  { code: 'NG', label: 'Nigeria', prefix: '+234', currency: '₦', minAmount: 50,
     placeholder: '08012345678 or +2348012345678' },
-  { code: 'GH', label: '🇬🇭 Ghana', prefix: '+233', currency: 'GH₵', minAmount: 1,
+  { code: 'GH', label: 'Ghana', prefix: '+233', currency: 'GH₵', minAmount: 1,
     placeholder: '+233241234567', phoneRegex: /^\+233[235]\d{8}$/ },
 ];
 const NG_PRESETS = [50, 100, 200, 500, 1000, 2000];
@@ -39,14 +39,14 @@ function getErrorMsg(err) {
   const code = e?.error?.code;
   const msg = e?.error?.message || e?.message;
   const MAP = {
-    INSUFFICIENT_FUNDS: '❌ Your wallet balance is too low. Please fund your wallet first.',
-    INVALID_PIN: '🔐 Wrong transaction PIN. Please try again.',
-    WALLET_LOCKED: '🔒 Your wallet is currently locked. Contact support to unlock it.',
-    PIN_REQUIRED: '🔑 You need to set a transaction PIN first. Go to Profile → Security.',
-    DUPLICATE_REQUEST: '⚠️ This looks like a duplicate transaction. Please wait before retrying.',
-    TRANSACTION_FAILED: '❌ Transaction was rejected by the provider. Please try again.',
-    PAYMENT_INIT_FAILED: '❌ Could not initiate payment. Please try a different method.',
-    FETCH_FAILED: '⚠️ Service data could not be loaded. Please refresh and try again.',
+    INSUFFICIENT_FUNDS: 'Your wallet balance is too low. Please fund your wallet first.',
+    INVALID_PIN: 'Wrong transaction PIN. Please try again.',
+    WALLET_LOCKED: 'Your wallet is currently locked. Contact support to unlock it.',
+    PIN_REQUIRED: 'You need to set a transaction PIN first. Go to Profile → Security.',
+    DUPLICATE_REQUEST: 'This looks like a duplicate transaction. Please wait before retrying.',
+    TRANSACTION_FAILED: 'Transaction was rejected by the provider. Please try again.',
+    PAYMENT_INIT_FAILED: 'Could not initiate payment. Please try a different method.',
+    FETCH_FAILED: 'Service data could not be loaded. Please refresh and try again.',
   };
   return MAP[code] || msg || 'Something went wrong. Please try again.';
 }
@@ -146,7 +146,7 @@ export default function AirtimePage() {
         amount: parseFloat(form.amount),
         pin,
       });
-      toast.success(`${selectedCountry.currency}${parseFloat(form.amount).toLocaleString()} airtime sent to ${form.phone} ✓`);
+      toast.success(`${selectedCountry.currency}${parseFloat(form.amount).toLocaleString()} airtime sent to ${form.phone}`);
       setForm(p => ({ ...p, amount: '' }));
       setShowPin(false);
       refreshUser();
@@ -243,7 +243,7 @@ export default function AirtimePage() {
 
         {form.phone && form.network && form.amount && Object.keys(errors).length === 0 && (
           <div className="summary-box">
-            <div className="summary-row"><span>Country</span><span>{selectedCountry.label}</span></div>
+            <div className="summary-row"><span>Country</span><span>{selectedCountry.label} ({selectedCountry.code})</span></div>
             <div className="summary-row"><span>Network</span><span>{displayCode(form.network)}</span></div>
             <div className="summary-row"><span>Phone</span><span>{form.phone}</span></div>
             <div className="summary-row"><span>Total</span>

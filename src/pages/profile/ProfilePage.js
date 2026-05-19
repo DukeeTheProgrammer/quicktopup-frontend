@@ -45,7 +45,7 @@ export default function ProfilePage() {
     setSettingPin(true);
     try {
       await setPin({ new_pin: pinForm.new_pin, pin_confirm: pinForm.pin_confirm });
-      toast.success('Transaction PIN set successfully! 🔒');
+      toast.success('Transaction PIN set successfully!');
       setPinForm({ new_pin: '', pin_confirm: '' });
     } catch (err) {
       const d = err.response?.data;
@@ -196,7 +196,7 @@ export default function ProfilePage() {
                 </label>
               </div>
               <button className="btn btn-primary btn-full" type="submit" disabled={settingPin}>
-                {settingPin ? <span className="spinner" /> : '🔒 Set Transaction PIN'}
+                {settingPin ? <span className="spinner" /> : <><Lock size={16} /> Set Transaction PIN</>}
               </button>
             </form>
           </div>

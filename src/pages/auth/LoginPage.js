@@ -4,7 +4,7 @@ import AuthLayout from './AuthLayout';
 import { login } from '../../api/auth';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Hand } from 'lucide-react';
 
 export default function LoginPage() {
   const { loginUser } = useAuth();
@@ -32,7 +32,7 @@ export default function LoginPage() {
       localStorage.setItem('auth_token', token);
       localStorage.setItem('user', JSON.stringify(user));
       loginUser(user, token);
-      toast.success(`Welcome back, ${user?.first_name || 'there'}! 👋`);
+      toast.success(`Welcome back, ${user?.first_name || 'there'}!`);
       window.location.href = '/dashboard';
     } catch (err) {
       if (err.response) {
@@ -53,7 +53,7 @@ export default function LoginPage() {
   };
 
   return (
-    <AuthLayout title="Welcome back 👋" subtitle="Sign in to your QuickTopUp account">
+    <AuthLayout title={<span>Welcome back <Hand size={20} style={{ display: 'inline', verticalAlign: 'middle' }} /></span>} subtitle="Sign in to your QuickTopUp account">
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label className="form-label">Email Address</label>

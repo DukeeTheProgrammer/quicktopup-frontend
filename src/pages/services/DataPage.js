@@ -4,7 +4,7 @@ import { purchaseData } from '../../api/transactions';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import PinModal from './PinModal';
-import { Wifi, AlertCircle, RefreshCw } from 'lucide-react';
+import { Wifi, AlertCircle, RefreshCw, XCircle, Lock, KeyRound, AlertTriangle } from 'lucide-react';
 import './ServicePage.css';
 
 const NET_COLORS = {
@@ -37,9 +37,9 @@ function validatePhone(phone, countryCode) {
 }
 
 const COUNTRIES = [
-  { code: 'NG', label: '🇳🇬 Nigeria', currency: '₦',
+  { code: 'NG', label: 'Nigeria', currency: '₦',
     placeholder: '08012345678 or +2348012345678' },
-  { code: 'GH', label: '🇬🇭 Ghana', currency: 'GH₵',
+  { code: 'GH', label: 'Ghana', currency: 'GH₵',
     placeholder: '+233241234567' },
 ];
 const GH_CODES = ['vodafone', 'airteltigo'];
@@ -58,14 +58,14 @@ function getErrorMsg(err) {
   const code = err.response?.data?.error?.code;
   const msg = err.response?.data?.error?.message || err.response?.data?.message;
   const MAP = {
-    INSUFFICIENT_FUNDS: '❌ Wallet balance too low. Please fund your wallet first.',
-    INVALID_PIN: '🔐 Wrong transaction PIN. Please try again.',
-    WALLET_LOCKED: '🔒 Your wallet is locked. Contact support.',
-    PIN_REQUIRED: '🔑 Set a transaction PIN first — go to Profile → Security.',
-    DUPLICATE_REQUEST: '⚠️ Duplicate transaction detected. Please wait before retrying.',
-    TRANSACTION_FAILED: '❌ Transaction rejected by the network provider. Please try again.',
-    PAYMENT_INIT_FAILED: '❌ Payment initiation failed. Try a different method.',
-    FETCH_FAILED: '⚠️ Could not load service data. Please retry.',
+    INSUFFICIENT_FUNDS: 'Wallet balance too low. Please fund your wallet first.',
+    INVALID_PIN: 'Wrong transaction PIN. Please try again.',
+    WALLET_LOCKED: 'Your wallet is locked. Contact support.',
+    PIN_REQUIRED: 'Set a transaction PIN first — go to Profile → Security.',
+    DUPLICATE_REQUEST: 'Duplicate transaction detected. Please wait before retrying.',
+    TRANSACTION_FAILED: 'Transaction rejected by the network provider. Please try again.',
+    PAYMENT_INIT_FAILED: 'Payment initiation failed. Try a different method.',
+    FETCH_FAILED: 'Could not load service data. Please retry.',
   };
   return MAP[code] || msg || 'Something went wrong. Please try again.';
 }
@@ -187,7 +187,7 @@ export default function DataPage() {
         amount: parseFloat(selectedPlan?.amount || selectedPlan?.selling_price || 0),
         pin,
       });
-      toast.success(`${selectedPlan?.name} sent to ${form.phone} ✓`);
+      toast.success(`${selectedPlan?.name} sent to ${form.phone}`);
       setForm(p => ({ ...p, plan_id: null }));
       setSelectedPlan(null);
       setShowPin(false);
@@ -303,7 +303,7 @@ export default function DataPage() {
 
         {selectedPlan && form.phone && Object.keys(errors).length === 0 && (
           <div className="summary-box">
-            <div className="summary-row"><span>Country</span><span>{selectedCountry.label}</span></div>
+            <div className="summary-row"><span>Country</span><span>{selectedCountry.label} ({selectedCountry.code})</span></div>
             <div className="summary-row"><span>Plan</span><span>{selectedPlan.name}</span></div>
             {selectedPlan.data_size && <div className="summary-row"><span>Data</span><span>{selectedPlan.data_size}{selectedPlan.validity_days ? ` / ${selectedPlan.validity_days} days` : ''}</span></div>}
             <div className="summary-row"><span>Phone</span><span>{form.phone}</span></div>

@@ -3,7 +3,7 @@ import { getCablePlans } from '../../api/services';
 import { purchaseCable } from '../../api/transactions';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
-import { Tv, AlertCircle, RefreshCw } from 'lucide-react';
+import { Tv, AlertCircle, RefreshCw, XCircle, Lock, KeyRound, AlertTriangle } from 'lucide-react';
 import PinModal from './PinModal';
 import './ServicePage.css';
 
@@ -28,13 +28,13 @@ function getErrorMsg(err) {
   const code = err.response?.data?.error?.code;
   const msg = err.response?.data?.error?.message || err.response?.data?.message;
   const MAP = {
-    INSUFFICIENT_FUNDS: '❌ Wallet balance too low. Please fund your wallet first.',
-    INVALID_PIN: '🔐 Wrong transaction PIN. Please try again.',
-    WALLET_LOCKED: '🔒 Your wallet is locked. Contact support.',
-    PIN_REQUIRED: '🔑 Set a transaction PIN first — go to Profile → Security.',
-    DUPLICATE_REQUEST: '⚠️ Duplicate transaction detected. Please wait.',
-    TRANSACTION_FAILED: '❌ Subscription rejected by the provider. Please try again.',
-    FETCH_FAILED: '⚠️ Could not load cable plans right now.',
+    INSUFFICIENT_FUNDS: 'Wallet balance too low. Please fund your wallet first.',
+    INVALID_PIN: 'Wrong transaction PIN. Please try again.',
+    WALLET_LOCKED: 'Your wallet is locked. Contact support.',
+    PIN_REQUIRED: 'Set a transaction PIN first — go to Profile → Security.',
+    DUPLICATE_REQUEST: 'Duplicate transaction detected. Please wait.',
+    TRANSACTION_FAILED: 'Subscription rejected by the provider. Please try again.',
+    FETCH_FAILED: 'Could not load cable plans right now.',
   };
   return MAP[code] || msg || 'Something went wrong. Please try again.';
 }
@@ -115,7 +115,7 @@ export default function CablePage() {
         plan_id: selectedPlan.id || selectedPlan.plan_code,
         pin,
       });
-      toast.success(`${selectedPlan.name} subscription successful! ✓`);
+      toast.success(`${selectedPlan.name} subscription successful`);
       setSmartCard('');
       setSelectedPlan(null);
       setShowPin(false);
