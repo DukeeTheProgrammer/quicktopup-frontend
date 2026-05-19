@@ -1,7 +1,15 @@
 {
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/api/:path*",
+      "destination": "https://unmade-backboned-agreeably.ngrok-free.dev/api/:path*"
+    },
+    {
+      "source": "/admin/:path*",
+      "destination": "https://unmade-backboned-agreeably.ngrok-free.dev/admin/:path*"
+    },
+    {
+      "source": "/((?!admin|api).*)",
       "destination": "/index.html"
     }
   ]
