@@ -32,6 +32,7 @@
 .wallet-hero-top {
   display: flex; justify-content: space-between; align-items: flex-start;
   margin-bottom: 20px;
+  position: relative; z-index: 2;
 }
 
 .wallet-label { font-size: 13px; opacity: 0.8; margin-bottom: 6px; }
@@ -40,7 +41,7 @@
 .eye-btn {
   background: rgba(255,255,255,0.15); border: none; border-radius: 8px;
   color: white; cursor: pointer; padding: 8px; display: flex; align-items: center;
-  transition: background 0.2s;
+  transition: background 0.2s; position: relative; z-index: 3;
 }
 .eye-btn:hover { background: rgba(255,255,255,0.25); }
 
@@ -54,7 +55,7 @@
 
 .fund-btn {
   display: inline-flex; align-items: center; gap: 6px;
-  background: white; color: var(--green-dark);
+  background: var(--bg-card); color: var(--green-dark);
   padding: 10px 20px; border-radius: 10px;
   font-size: 14px; font-weight: 700; text-decoration: none;
   transition: all 0.2s; position: relative; z-index: 1;
@@ -71,7 +72,7 @@
 }
 .service-card {
   display: flex; flex-direction: column; align-items: center; gap: 10px;
-  background: white; border-radius: 16px; padding: 20px 12px;
+  background: var(--bg-card); border-radius: 16px; padding: 20px 12px;
   text-decoration: none; color: var(--text); font-size: 13px; font-weight: 600;
   box-shadow: var(--shadow-sm); transition: all 0.2s;
 }
@@ -82,7 +83,7 @@
 }
 
 .txn-list {
-  background: white; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-sm);
+  background: var(--bg-card); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-sm);
 }
 .txn-row {
   display: flex; align-items: center; gap: 14px;
