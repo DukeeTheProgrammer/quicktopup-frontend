@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { getWallet, fundWallet, getWalletLedger, getFundingStatus } from '../../api/wallet';
 import toast from 'react-hot-toast';
-import { Wallet, ArrowDownCircle, ArrowUpCircle, Plus, RefreshCw, AlertCircle, CreditCard, Building2, Smartphone, DollarSign } from 'lucide-react';
+import { Wallet, ArrowDownCircle, ArrowUpCircle, Plus, RefreshCw, AlertCircle, CreditCard, Building2, Smartphone, DollarSign, Lock } from 'lucide-react';
 import './Wallet.css';
 
 const FUND_PRESETS = [1000, 2000, 5000, 10000, 20000, 50000];

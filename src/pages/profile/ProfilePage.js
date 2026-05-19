@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { updateProfile, setPin } from '../../api/auth';
 import toast from 'react-hot-toast';
-import { User, Shield, Phone, Mail, CheckCircle, Clock, Key } from 'lucide-react';
+import { User, Shield, Phone, Mail, CheckCircle, Clock, Key, Lock } from 'lucide-react';
 
 export default function ProfilePage() {
   const { user, refreshUser } = useAuth();
