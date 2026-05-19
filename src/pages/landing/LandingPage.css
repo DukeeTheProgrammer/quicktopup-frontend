@@ -44,10 +44,13 @@
   box-shadow: 0 2px 20px rgba(0,0,0,.35);
 }
 [data-theme="dark"] .lp-logo-text { color: var(--text); }
-[data-theme="dark"] .lp-nav-links a { color: rgba(232,237,243,0.7); }
+[data-theme="dark"] .lp-nav-links { background: var(--bg-card); }
+[data-theme="dark"] .lp-nav-links a { color: var(--text); }
 [data-theme="dark"] .lp-nav-links a:hover { color: var(--green); }
+[data-theme="dark"] .lp-nav-links a { border-bottom-color: var(--border); }
 [data-theme="dark"] .lp-hamburger { color: var(--text); }
 [data-theme="dark"] .lp-hamburger:hover { background: var(--gray-200); }
+[data-theme="dark"] .lp-theme-toggle { color: var(--green); }
 [data-theme="dark"] .lp-hero {
   background: linear-gradient(150deg, #0d1f17 0%, #0f1e17 35%, #131722 70%, #131722 100%);
 }
@@ -77,7 +80,7 @@
 [data-theme="dark"] .lp-service-card:hover { border-color: var(--green); }
 [data-theme="dark"] .lp-service-card p { color: var(--text-muted); }
 [data-theme="dark"] .lp-svc-badge { background: var(--green-light); }
-[data-theme="dark"] .btn-outline { color: var(--green); border-color: var(--green); }
+[data-theme="dark"] .btn-outline { color: var(--green); border-color: var(--green); background: transparent; }
 [data-theme="dark"] .btn-outline:hover { background: var(--green); color: #fff; }
 [data-theme="dark"] .network-grid { }
 [data-theme="dark"] .network-tag {
@@ -712,6 +715,7 @@
   .lp-nav-links {
     position: fixed; inset: 0; top: 64px;
     background: var(--bg-card);
+    border-right: 1px solid var(--border);
     flex-direction: column; align-items: flex-start;
     padding: 24px 5%; gap: 6px;
     transform: translateX(-100%);
