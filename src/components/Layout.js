@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { logout } from '../api/auth';
 import toast from 'react-hot-toast';
 import {
@@ -23,6 +24,7 @@ const navItems = [
 
 export default function Layout({ children }) {
   const { user, logoutUser } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -72,6 +74,11 @@ export default function Layout({ children }) {
               <div className="user-email">{user?.email}</div>
             </div>
           </div>
+          <div className="theme-toggle-wrap" style={{ marginBottom: 10, paddingLeft: 2 }}>
+            <span className="theme-icon">{theme === 'dark' ? '🌙' : '☀️'}</span>
+            <span style={{ flex: 1, fontSize: 13 }}>{theme === 'dark' ? 'Dark mode' : 'Light mode'}</span>
+            <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme" />
+          </div>
           <button className="logout-btn" onClick={handleLogout}>
             <LogOut size={16} /> Logout
           </button>
@@ -83,6 +90,16 @@ export default function Layout({ children }) {
         <header className="topbar">
           <button className="menu-btn" onClick={() => setSidebarOpen(true)}><Menu size={22} /></button>
           <div className="topbar-right">
+            <button
+              onClick={toggleTheme}
+              style={{ background: 'none', border: 'none', cursor: 'pointer',
+                fontSize: 18, padding: '4px 6px', borderRadius: 8,
+                color: 'var(--text-muted)', transition: 'background 0.15s' }}
+              title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? '☀️' : '🌙'}
+            </button>
             <div className="wallet-chip">
               <Wallet size={14} />
               <span>₦{parseFloat(user?.wallet_balance || 0).toLocaleString()}</span>
