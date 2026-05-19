@@ -14,7 +14,7 @@ const NET_COLORS = {
 };
 const COUNTRIES = [
   { code: 'NG', label: '🇳🇬 Nigeria', currency: '₦',
-    placeholder: '+2348012345678', phoneRegex: /^\+234[7-9][01]\d{8}$/ },
+    placeholder: '08012345678 or +2348012345678' },
   { code: 'GH', label: '🇬🇭 Ghana', currency: 'GH₵',
     placeholder: '+233241234567', phoneRegex: /^\+233[235]\d{8}$/ },
 ];
@@ -127,8 +127,10 @@ export default function DataPage() {
     if (!form.network) e.network = 'Please select a network';
     if (!form.phone.trim()) {
       e.phone = 'Phone number is required';
-    } else if (!selectedCountry.phoneRegex.test(form.phone.trim())) {
-      e.phone = `Enter a valid ${selectedCountry.label} number (e.g. ${selectedCountry.placeholder})`;
+    } else if (country === 'GH' && selectedCountry.phoneRegex && !selectedCountry.phoneRegex.test(form.phone.trim())) {
+      e.phone = `Enter a valid Ghana number (e.g. ${selectedCountry.placeholder})`;
+    } else if (form.phone.trim().length < 7) {
+      e.phone = 'Phone number is too short';
     }
     if (!form.plan_id) e.plan = 'Please select a data plan';
     if (selectedPlan) {
