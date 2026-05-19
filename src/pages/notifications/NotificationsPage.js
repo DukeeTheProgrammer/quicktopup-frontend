@@ -38,7 +38,7 @@ export default function NotificationsPage() {
       ) : notifs.length === 0 ? (
         <div className="empty-state"><Bell size={48} /><p>No notifications yet</p></div>
       ) : (
-        <div style={{ background: 'white', borderRadius: 16, overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 16, overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
           {notifs.map(n => {
             const Icon = CHANNEL_ICONS[n.channel] || Bell;
             const isRead = n.status === 'read';
