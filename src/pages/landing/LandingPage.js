@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTheme } from '../../context/ThemeContext';
 import { Link } from 'react-router-dom';
 import { Zap, Shield, CheckCircle, Menu, X } from 'lucide-react';
 import './LandingPage.css';
@@ -109,6 +110,7 @@ function FaqItem({ q, a, i }) {
 export default function LandingPage() {
   const [navOpen, setNavOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   const [heroRef, heroIn] = useInView(0.1);
   const [statsRef, statsIn] = useInView(0.2);
@@ -140,11 +142,17 @@ export default function LandingPage() {
           <a href="#security" onClick={() => setNavOpen(false)}>Security</a>
           <a href="#faq" onClick={() => setNavOpen(false)}>FAQ</a>
           <div className="lp-nav-cta-mobile">
+            <button className="lp-theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
+              {theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode'}
+            </button>
             <Link to="/login" className="btn-outline" onClick={() => setNavOpen(false)}>Log In</Link>
             <Link to="/register" className="btn-solid" onClick={() => setNavOpen(false)}>Get Started</Link>
           </div>
         </div>
         <div className="lp-nav-cta lp-nav-cta-desktop">
+          <button className="lp-theme-toggle" onClick={toggleTheme} aria-label="Toggle theme" title={theme === 'dark' ? 'Light mode' : 'Dark mode'}>
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
           <Link to="/login" className="btn-outline">Log In</Link>
           <Link to="/register" className="btn-solid">Get Started</Link>
         </div>
