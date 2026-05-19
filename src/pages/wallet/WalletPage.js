@@ -296,7 +296,7 @@ export default function WalletPage() {
           style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: 20 }}
           onClick={(e) => { if (e.target === e.currentTarget) setShowFund(false); }}
         >
-          <div style={{ background: 'white', borderRadius: 20, padding: 32, width: '100%', maxWidth: 420 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 32, width: '100%', maxWidth: 420 }}>
             <h3 style={{ fontWeight: 800, marginBottom: 6 }}>Fund Wallet</h3>
             <p style={{ fontSize: 13, color: 'var(--gray-500)', marginBottom: 24 }}>
               Powered by Flutterwave — secure, instant payment
