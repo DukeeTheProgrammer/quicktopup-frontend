@@ -59,7 +59,7 @@ export default function ProfilePage() {
       <div className="page-subtitle">Manage your account information</div>
 
       {/* Profile summary card */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16, background: 'white', borderRadius: 16, padding: 20, marginBottom: 20, boxShadow: 'var(--shadow-sm)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, background: 'var(--bg-card)', borderRadius: 16, padding: 20, marginBottom: 20, boxShadow: 'var(--shadow-sm)' }}>
         <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, fontWeight: 800, color: 'white', flexShrink: 0 }}>
           {user?.first_name?.[0]}{user?.last_name?.[0]}
         </div>
@@ -77,7 +77,7 @@ export default function ProfilePage() {
             }`}>
               KYC: {user?.kyc_status || 'unverified'}
             </span>
-            <span style={{ fontSize: 12, background: 'var(--gray-100)', borderRadius: 20, padding: '3px 10px', color: 'var(--gray-600)' }}>
+            <span style={{ fontSize: 12, background: 'var(--gray-100)', borderRadius: 20, padding: '3px 10px', color: 'var(--gray-500)' }}>
               KYC Level {user?.kyc_level ?? 0}
             </span>
           </div>
@@ -93,7 +93,7 @@ export default function ProfilePage() {
           <button key={k} onClick={() => setTab(k)}
             style={{
               flex: 1, padding: '9px', borderRadius: 9, border: 'none',
-              background: tab === k ? 'white' : 'none', cursor: 'pointer',
+              background: tab === k ? 'var(--bg-card)' : 'none', cursor: 'pointer',
               fontSize: 14, fontWeight: 600,
               color: tab === k ? 'var(--text)' : 'var(--gray-500)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
@@ -126,7 +126,7 @@ export default function ProfilePage() {
               <label className="form-label">Email Address</label>
               <div style={{ position: 'relative' }}>
                 <input className="form-input" value={user?.email} disabled
-                  style={{ paddingLeft: 40, background: 'var(--gray-100)', cursor: 'not-allowed' }} />
+                  style={{ paddingLeft: 40, background: 'var(--bg-input)', cursor: 'not-allowed', opacity: 0.6 }} />
                 <Mail size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--gray-400)' }} />
               </div>
               <small style={{ color: 'var(--gray-400)', fontSize: 12 }}>Email cannot be changed</small>
