@@ -98,3 +98,49 @@
   transition: background 0.15s;
 }
 .retry-btn:hover { background: #fed7d7; }
+
+/* ── Service page responsive ── */
+@media (max-width: 768px) {
+  .service-form-card { padding: 22px 18px; border-radius: 16px; }
+  .plan-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .cable-provider-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .network-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .pin-inputs { gap: 8px; }
+  .pin-input { width: 46px; height: 52px; font-size: 20px; }
+}
+@media (max-width: 480px) {
+  .service-form-card { padding: 18px 14px; }
+  .plan-grid { grid-template-columns: 1fr; }
+  .cable-provider-grid { grid-template-columns: repeat(2, 1fr); }
+  .network-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .network-btn { padding: 10px 4px; font-size: 11px; }
+  .network-btn .net-icon { width: 32px; height: 32px; font-size: 11px; }
+  .pin-input { width: 42px; height: 48px; font-size: 18px; }
+  .amount-presets { gap: 6px; }
+  .preset-btn { padding: 6px 10px; font-size: 12px; }
+  .summary-box { padding: 14px; }
+}
+@media (max-width: 360px) {
+  .cable-provider-grid { grid-template-columns: 1fr 1fr; }
+  .pin-input { width: 38px; height: 44px; }
+}
+
+/* ── Service page animations ── */
+.service-form-card { animation: slideInUp 0.5s cubic-bezier(.22,1,.36,1) both; }
+.network-btn {
+  transition: all 0.25s cubic-bezier(.34,1.56,.64,1);
+}
+.network-btn:hover { transform: translateY(-3px) scale(1.06); }
+.network-btn.selected { transform: scale(1.05); }
+.plan-btn {
+  transition: all 0.25s cubic-bezier(.34,1.56,.64,1);
+}
+.plan-btn:hover { transform: translateY(-2px); }
+.plan-btn.selected { transform: scale(1.03); }
+.cable-provider-btn { transition: all 0.25s cubic-bezier(.34,1.56,.64,1); }
+.cable-provider-btn:hover { transform: translateY(-3px) scale(1.04); }
+.cable-provider-btn.selected { transform: scale(1.04); }
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
