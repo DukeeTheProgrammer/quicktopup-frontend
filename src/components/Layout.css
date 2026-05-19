@@ -141,3 +141,25 @@
   .sidebar-overlay { display: block; }
   .main-content { padding: 20px 16px; }
 }
+
+/* ── Layout responsive extras ── */
+@media (max-width: 480px) {
+  .topbar { padding: 10px 14px; }
+  .wallet-chip { padding: 5px 10px; font-size: 12px; }
+  .avatar.sm { width: 28px; height: 28px; font-size: 11px; }
+  .main-content { padding: 16px 12px; }
+}
+@media (max-width: 360px) {
+  .topbar { padding: 8px 10px; }
+  .wallet-chip { display: none; }
+}
+
+/* ── Layout animations ── */
+.main-content { animation: fadeInContent 0.4s ease both; }
+@keyframes fadeInContent {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.nav-item { transition: all 0.2s cubic-bezier(.34,1.56,.64,1); }
+.nav-item:hover { transform: translateX(4px); }
+.nav-item.active { transform: none; }
