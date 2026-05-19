@@ -3,6 +3,79 @@ import { MessageCircle, X, Minus, Send, RotateCcw, ChevronRight } from 'lucide-r
 import './CustomerSupport.css';
 
 // ─────────────────────────────────────────
+// Small Talk / Identity Responses
+// ─────────────────────────────────────────
+const SMALL_TALK = [
+  {
+    id: 'greeting',
+    patterns: ['hi', 'hello', 'hey', 'helo', 'howdy', 'good morning', 'good afternoon', 'good evening', 'sup', 'whatsup', 'hi there', 'hello there', 'hey there', 'morning', 'afternoon', 'evening'],
+    respond: () => {
+      const opts = [
+        "Hello! \u{1F44B} Welcome to QuickTopUp.ng. How can I help you today?",
+        "Hey there! \u{1F60A} I'm here to help. What do you need?",
+        "Hi! Happy to help. Ask me anything about our services \u{1F680}",
+      ];
+      return opts[Math.floor(Math.random() * opts.length)];
+    },
+  },
+  {
+    id: 'who_are_you',
+    patterns: ['who are you', 'what are you', 'who is this', 'what is this', 'are you a bot', 'are you human', 'are you ai', 'are you real', 'are you a robot', 'talk to human', 'speak to human', 'talk to agent', 'speak to agent', 'real person', 'live agent', 'who am i talking to', 'what kind of bot'],
+    respond: () => "I'm QuickBot \u{1F916} — QuickTopUp.ng's virtual support assistant. I can answer questions about funding your wallet, buying airtime, data, cable TV, electricity, and more.\n\nFor issues I can't resolve, I'll connect you to our team at quicktopup.it.com@gmail.com.",
+  },
+  {
+    id: 'how_are_you',
+    patterns: ['how are you', 'how are you doing', 'how do you do', 'you good', 'you okay', 'hows it going', 'how r u'],
+    respond: () => "I'm doing great, thanks for asking! \u{1F604} Ready to help you with all your VTU needs. What can I do for you?",
+  },
+  {
+    id: 'thank_you',
+    patterns: ['thank you', 'thanks', 'thank u', 'thx', 'thnks', 'thnx', 'appreciate it', 'appreciated', 'helpful', 'that helped', 'got it', 'okay thanks', 'ok thanks', 'alright thanks', 'perfect thanks'],
+    respond: () => {
+      const opts = [
+        "You're welcome! \u{1F60A} Is there anything else I can help you with?",
+        "Happy to help! Let me know if you need anything else \u{1F642}",
+        "Anytime! Feel free to ask if you have more questions \u{1F680}",
+      ];
+      return opts[Math.floor(Math.random() * opts.length)];
+    },
+  },
+  {
+    id: 'goodbye',
+    patterns: ['bye', 'goodbye', 'see you', 'later', 'take care', 'good night', 'goodnight', 'cya', 'ok bye', 'okay bye', 'alright bye', 'done', 'nothing else', 'no thanks', 'no thank you', 'thats all'],
+    respond: () => "Goodbye! \u{1F44B} Thanks for using QuickTopUp.ng. Have a great day!",
+  },
+  {
+    id: 'name_question',
+    patterns: ['your name', 'whats your name', 'what is your name', 'what do i call you', 'do you have a name', 'name please'],
+    respond: () => "I'm QuickBot \u{1F916} — your QuickTopUp.ng support assistant! How can I help you?",
+  },
+  {
+    id: 'compliment',
+    patterns: ['you are great', 'you are good', 'you are helpful', 'nice bot', 'good bot', 'love you', 'awesome', 'amazing', 'brilliant', 'excellent', 'well done'],
+    respond: () => "Aww, thank you! \u{1F60A} That means a lot. Let me know if you ever need help!",
+  },
+  {
+    id: 'complaint',
+    patterns: ['bad bot', 'useless', 'not helpful', 'you suck', 'terrible', 'not working', 'broken', 'dumb bot', 'stupid bot'],
+    respond: () => "I'm sorry I couldn't help! \u{1F614} Please email us at quicktopup.it.com@gmail.com and our team will assist you directly.",
+  },
+];
+
+function findSmallTalk(rawInput) {
+  const lower = rawInput.toLowerCase().replace(/[^a-z0-9'\s]/g, ' ').trim();
+  for (const entry of SMALL_TALK) {
+    for (const pattern of entry.patterns) {
+      // Exact match or contained
+      if (lower === pattern || lower.includes(pattern)) {
+        return typeof entry.respond === 'function' ? entry.respond() : entry.respond;
+      }
+    }
+  }
+  return null;
+}
+
+// ─────────────────────────────────────────
 // FAQ Knowledge Base
 // ─────────────────────────────────────────
 const FAQ = [
@@ -354,17 +427,24 @@ export default function CustomerSupport() {
     addMsg('user', text);
 
     setTimeout(() => {
+      // 1. Check small talk / greetings first
+      const smallTalk = findSmallTalk(text);
+      if (smallTalk) {
+        addMsg('bot', smallTalk);
+        return;
+      }
+      // 2. FAQ knowledge base
       const match = findAnswer(text);
       if (match) {
         addMsg('bot', `**${match.q}**\n\n${match.a}`);
       } else {
         addMsg('bot',
-          "I'm not sure about that one. Here are some things I can help with:\n\n" +
-          QUICK_TOPICS.map(t => `• ${t.label}`).join('\n') +
+          "Hmm, I'm not sure about that one. Here are some things I can help with:\n\n" +
+          QUICK_TOPICS.slice(0, 6).map(t => `• ${t.label}`).join('\n') +
           '\n\nOr email us at quicktopup.it.com@gmail.com 🙂'
         );
       }
-    }, 400);
+    }, 380);
   }, [input]);
 
   const handleTopic = (id) => {
