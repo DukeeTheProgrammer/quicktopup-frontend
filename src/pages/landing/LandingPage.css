@@ -587,3 +587,185 @@
   .lp-stat-num { font-size: 1.2rem; }
   .lp-logo-text { font-size: 1rem; }
 }
+
+/* ── NEW: Advanced landing animations ──────────────────── */
+@keyframes gradientText {
+  0%,100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+@keyframes cardLift {
+  from { transform: translateY(0) scale(1); box-shadow: var(--shadow-sm); }
+  to   { transform: translateY(-12px) scale(1.02); box-shadow: 0 32px 64px rgba(0,185,107,.18); }
+}
+@keyframes borderGlow {
+  0%,100% { border-color: rgba(0,185,107,0.3); }
+  50%      { border-color: rgba(0,185,107,0.9); }
+}
+@keyframes stepFloat {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+@keyframes badgePop {
+  0%   { transform: scale(0); opacity: 0; }
+  70%  { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes heroShimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes navSlideDown {
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+@keyframes statCountIn {
+  from { opacity:0; transform: scale(0.5) translateY(20px); }
+  to   { opacity:1; transform: scale(1) translateY(0); }
+}
+@keyframes providerSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── Animated gradient hero headline ── */
+.lp-hero h1 em {
+  background: linear-gradient(90deg, #00b96b, #00d97e, #4ade80, #00b96b);
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientText 4s linear infinite;
+}
+
+/* ── Hero badge entrance ── */
+.lp-hero-badge { animation: badgePop 0.6s cubic-bezier(.22,1,.36,1) 0.2s both; }
+
+/* ── Stats count animation ── */
+.lp-stat-num {
+  display: block;
+  animation: statCountIn 0.7s cubic-bezier(.22,1,.36,1) both;
+}
+.lp-stat:nth-child(1) .lp-stat-num { animation-delay: 0.1s; }
+.lp-stat:nth-child(2) .lp-stat-num { animation-delay: 0.2s; }
+.lp-stat:nth-child(3) .lp-stat-num { animation-delay: 0.3s; }
+.lp-stat:nth-child(4) .lp-stat-num { animation-delay: 0.4s; }
+
+/* ── Nav entrance ── */
+.lp-nav { animation: navSlideDown 0.5s cubic-bezier(.22,1,.36,1) both; }
+
+/* ── Service card hover ── */
+.lp-service-card {
+  transition: transform 0.4s cubic-bezier(.34,1.56,.64,1),
+              box-shadow 0.4s ease, border-color 0.3s;
+}
+.lp-service-card:hover {
+  transform: translateY(-14px) scale(1.02) rotate(-0.5deg);
+  box-shadow: 0 32px 64px rgba(0,185,107,.18);
+  border-color: var(--green);
+}
+.lp-service-icon { transition: transform 0.3s cubic-bezier(.34,1.56,.64,1); }
+.lp-service-card:hover .lp-service-icon { transform: scale(1.18) rotate(-6deg); }
+
+/* ── Step card hover ── */
+.lp-step { transition: transform 0.3s ease, box-shadow 0.3s; }
+.lp-step:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,185,107,.12); }
+
+/* ── Network badge hover ── */
+.lp-network-badge {
+  transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), background 0.2s;
+}
+.lp-network-badge:hover { transform: scale(1.1) translateY(-3px); }
+
+/* ── Security card pulse border ── */
+.lp-security-card { transition: transform 0.3s, background 0.2s; }
+.lp-security-card:hover { transform: translateY(-6px) scale(1.015); animation: borderGlow 2s ease-in-out infinite; }
+
+/* ── Provider badge spin icon on hover ── */
+.provider-badge { transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s; }
+.provider-badge:hover { transform: translateY(-4px) scale(1.06); box-shadow: 0 8px 24px rgba(0,185,107,.2); }
+
+/* ── CTA gradient shift ── */
+.lp-cta-section {
+  background: linear-gradient(135deg, #003d22, #006b3c, #00b96b, #006b3c, #003d22);
+  background-size: 300% 300%;
+  animation: gradientShift 8s ease infinite;
+}
+
+/* ── FAQ open/close smooth ── */
+.faq-a { transition: max-height 0.35s ease, padding 0.2s ease, opacity 0.2s ease; }
+
+/* ══════════ COMPREHENSIVE RESPONSIVE FIXES ══════════ */
+
+/* ── 1140px: large desktop ── */
+@media (max-width: 1140px) {
+  .lp-services-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── 900px: tablet landscape ── */
+@media (max-width: 900px) {
+  .lp-hero h1 { font-size: clamp(2rem, 5vw, 3rem); }
+  .lp-section { padding: 72px 5%; }
+  .lp-nav-links {
+    position: fixed; inset: 0; top: 64px;
+    background: var(--bg-card);
+    flex-direction: column; align-items: flex-start;
+    padding: 24px 5%; gap: 6px;
+    transform: translateX(-100%);
+    transition: transform 0.32s cubic-bezier(.22,1,.36,1);
+    overflow-y: auto; z-index: 199;
+    box-shadow: 4px 0 30px rgba(0,0,0,.12);
+  }
+  .lp-nav-links.open { transform: translateX(0); }
+  .lp-nav-links a { font-size: 1.1rem; padding: 12px 0; width: 100%; border-bottom: 1px solid var(--border); }
+  .lp-nav-cta-desktop { display: none; }
+  .lp-nav-cta-mobile { display: flex; flex-direction: column; gap: 10px; width: 100%; padding-top: 16px; }
+  .lp-nav-cta-mobile .btn-outline,
+  .lp-nav-cta-mobile .btn-solid { text-align: center; padding: 12px; width: 100%; font-size: 1rem; }
+  .lp-hamburger { display: flex; }
+  .lp-nav-overlay { display: block; position: fixed; inset: 0; top: 64px; background: var(--overlay); z-index: 198; }
+  .lp-services-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .lp-steps-grid { grid-template-columns: repeat(2, 1fr); }
+  .provider-logos { gap: 10px; }
+}
+
+/* ── 640px: mobile ── */
+@media (max-width: 640px) {
+  .lp-section { padding: 56px 4%; }
+  .lp-hero { padding-left: 4%; padding-right: 4%; }
+  .lp-hero h1 { font-size: clamp(1.8rem, 7vw, 2.6rem); letter-spacing: -0.01em; }
+  .lp-hero p { font-size: 0.95rem; }
+  .lp-hero-actions { gap: 10px; }
+  .btn-hero-primary, .btn-hero-secondary { padding: 12px 22px; font-size: 0.95rem; width: 100%; justify-content: center; }
+  .lp-hero-stats { flex-direction: row; flex-wrap: wrap; padding: 16px 20px; gap: 0; }
+  .lp-stat { min-width: 50%; border-right: none; border-bottom: 1px solid var(--border); padding: 12px 8px; }
+  .lp-stat:nth-child(1), .lp-stat:nth-child(2) { border-right: 1px solid var(--border); }
+  .lp-stat:nth-child(3), .lp-stat:nth-child(4) { border-bottom: none; }
+  .lp-stat-num { font-size: 1.4rem; }
+  .lp-services-grid { grid-template-columns: 1fr; gap: 14px; }
+  .lp-service-card { flex-direction: row; gap: 16px; padding: 18px 16px; }
+  .lp-svc-top { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .lp-steps-grid { grid-template-columns: 1fr; }
+  .lp-step { text-align: left; }
+  .step-num { font-size: 3rem; }
+  .lp-security-grid { grid-template-columns: 1fr; }
+  .faq-list { max-width: 100%; }
+  .section-title { font-size: clamp(1.4rem, 5vw, 1.9rem); }
+  .network-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .lp-network-badge { padding: 10px 6px; font-size: 0.72rem; }
+  .footer-grid { grid-template-columns: 1fr; gap: 28px; }
+  .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+  .lp-cta-inner h2 { font-size: clamp(1.4rem, 5vw, 2rem); }
+  .lp-cta-inner p { font-size: 0.9rem; }
+}
+
+/* ── 400px: very small phones ── */
+@media (max-width: 400px) {
+  .lp-hero h1 { font-size: 1.65rem; }
+  .lp-stat-num { font-size: 1.2rem; }
+  .lp-services-grid { gap: 10px; }
+  .lp-service-card { padding: 14px 12px; }
+}
