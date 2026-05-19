@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { getCablePlans } from '../../api/services';
 import { purchaseCable } from '../../api/transactions';
 import { useAuth } from '../../context/AuthContext';
+import { getUserCurrency } from '../../utils/currency';
 import toast from 'react-hot-toast';
 import { Tv, AlertCircle, RefreshCw } from 'lucide-react';
 import PinModal from './PinModal';
@@ -53,6 +54,7 @@ function FieldError({ msg }) {
 
 export default function CablePage() {
   const { user, refreshUser } = useAuth();
+  const cur = getUserCurrency(user);
   const [plans, setPlans] = useState([]);
   const [provider, setProvider] = useState('');
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -97,7 +99,7 @@ export default function CablePage() {
     }
     if (!selectedPlan) e.plan = 'Please select a package';
     else if (planAmount(selectedPlan) > parseFloat(user?.wallet_balance || 0)) {
-      e.plan = `Insufficient balance (need ₦${planAmount(selectedPlan).toLocaleString()})`;
+      e.plan = `Insufficient balance (need ${cur.symbol}${planAmount(selectedPlan).toLocaleString()})`;
     }
     return e;
   };
@@ -199,7 +201,7 @@ export default function CablePage() {
                     onClick={() => { setSelectedPlan(plan); setErrors(p => ({ ...p, plan: '' })); }}>
                     <div className="plan-name">{plan.name}</div>
                     {plan.validity_days && <div className="plan-validity">{plan.validity_days} days</div>}
-                    <div className="plan-price">₦{planAmount(plan).toLocaleString()}</div>
+                    <div className="plan-price">{cur.symbol}{planAmount(plan).toLocaleString()}</div>
                   </button>
                 ))}
               </div>
@@ -214,7 +216,7 @@ export default function CablePage() {
             <div className="summary-row"><span>Package</span><span>{selectedPlan.name}</span></div>
             {selectedPlan.validity_days && <div className="summary-row"><span>Duration</span><span>{selectedPlan.validity_days} days</span></div>}
             <div className="summary-row"><span>Smart Card</span><span>{smartCard}</span></div>
-            <div className="summary-row"><span>Total</span><span><strong>₦{planAmount(selectedPlan).toLocaleString()}</strong></span></div>
+            <div className="summary-row"><span>Total</span><span><strong>{cur.symbol}{planAmount(selectedPlan).toLocaleString()}</strong></span></div>
           </div>
         )}
 
@@ -222,7 +224,7 @@ export default function CablePage() {
           {loading ? <span className="spinner" /> : <><Tv size={16} /> Subscribe Now</>}
         </button>
         <p style={{ fontSize: 12, color: 'var(--gray-500)', textAlign: 'center', marginTop: 12 }}>
-          Wallet balance: ₦{parseFloat(user?.wallet_balance || 0).toLocaleString()} · Deducted instantly
+          Wallet balance: {cur.symbol}{parseFloat(user?.wallet_balance || 0).toLocaleString()} · Deducted instantly
         </p>
       </div>
 

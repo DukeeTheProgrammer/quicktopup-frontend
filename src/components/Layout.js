@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { logout } from '../api/auth';
 import toast from 'react-hot-toast';
+import { getUserCurrency } from '../utils/currency';
 import {
   LayoutDashboard, Phone, Wifi, Tv, Zap, Wallet, ClipboardList,
   Bell, User, LogOut, Menu, X, ChevronRight, Sun, Moon
@@ -27,6 +28,7 @@ export default function Layout({ children }) {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const cur = getUserCurrency(user);
 
   const handleLogout = async () => {
     try { await logout(); } catch {}
@@ -102,7 +104,7 @@ export default function Layout({ children }) {
             </button>
             <div className="wallet-chip">
               <Wallet size={14} />
-              <span>₦{parseFloat(user?.wallet_balance || 0).toLocaleString()}</span>
+              <span>{cur.symbol}{parseFloat(user?.wallet_balance || 0).toLocaleString()}</span>
             </div>
             <div className="avatar sm">{initials}</div>
           </div>

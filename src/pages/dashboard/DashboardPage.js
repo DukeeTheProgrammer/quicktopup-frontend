@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { getWallet } from '../../api/wallet';
 import { getTransactions } from '../../api/transactions';
 import { useAuth } from '../../context/AuthContext';
+import { getUserCurrency } from '../../utils/currency';
 import { Phone, Wifi, Tv, Zap, Plus, ArrowUpRight, ArrowDownLeft, RefreshCw, Eye, EyeOff, Hand } from 'lucide-react';
 import './Dashboard.css';
 
@@ -29,6 +30,7 @@ export default function DashboardPage() {
   const [txns, setTxns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showBal, setShowBal] = useState(true);
+  const cur = getUserCurrency(user);
 
   useEffect(() => {
     const load = async () => {
@@ -55,8 +57,8 @@ export default function DashboardPage() {
             <div className="wallet-label">Available Balance</div>
             <div className="wallet-balance">
               {showBal
-                ? `₦${parseFloat(wallet?.available_balance || user?.wallet_balance || 0).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`
-                : '₦ ••••••'
+                ? `${cur.symbol}${parseFloat(wallet?.available_balance || user?.wallet_balance || 0).toLocaleString(cur.locale, { minimumFractionDigits: 2 })}`
+                : `${cur.symbol} ••••••`
               }
             </div>
           </div>
@@ -66,8 +68,8 @@ export default function DashboardPage() {
         </div>
         {wallet && (
           <div className="wallet-stats">
-            <div><span className="ws-label">Total Credited</span><span className="ws-val credit">↑ ₦{parseFloat(wallet.total_credited).toLocaleString()}</span></div>
-            <div><span className="ws-label">Total Debited</span><span className="ws-val debit">↓ ₦{parseFloat(wallet.total_debited).toLocaleString()}</span></div>
+            <div><span className="ws-label">Total Credited</span><span className="ws-val credit">↑ {cur.symbol}{parseFloat(wallet.total_credited).toLocaleString()}</span></div>
+            <div><span className="ws-label">Total Debited</span><span className="ws-val debit">↓ {cur.symbol}{parseFloat(wallet.total_debited).toLocaleString()}</span></div>
             <div><span className="ws-label">Transactions</span><span className="ws-val">{wallet.transaction_count}</span></div>
           </div>
         )}
@@ -113,10 +115,10 @@ export default function DashboardPage() {
               </div>
               <div className="txn-info">
                 <div className="txn-desc">{serviceLabel(txn.service_type)} — {txn.phone || txn.reference}</div>
-                <div className="txn-date">{new Date(txn.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+                <div className="txn-date">{new Date(txn.created_at).toLocaleDateString(cur.locale, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
               </div>
               <div className="txn-right">
-                <div className="txn-amount">-₦{parseFloat(txn.total_amount).toLocaleString()}</div>
+                <div className="txn-amount">-{cur.symbol}{parseFloat(txn.total_amount).toLocaleString()}</div>
                 <span className={`badge ${statusBadge(txn.status)}`}>{txn.status}</span>
               </div>
             </div>

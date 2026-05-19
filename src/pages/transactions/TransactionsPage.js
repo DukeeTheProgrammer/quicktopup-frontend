@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { getTransactions } from '../../api/transactions';
+import { useAuth } from '../../context/AuthContext';
+import { getUserCurrency } from '../../utils/currency';
 import { ClipboardList, Search, ChevronLeft, ChevronRight, Phone, Wifi, Tv, Zap, CreditCard } from 'lucide-react';
 
 const STATUS_MAP = { success: 'badge-success', failed: 'badge-danger', pending: 'badge-warning', processing: 'badge-info' };
@@ -8,12 +10,14 @@ const SERVICE_ICONS = { airtime: Phone, data: Wifi, cable: Tv, electricity: Zap 
 const PAGE_SIZE = 20;
 
 export default function TransactionsPage() {
+  const { user } = useAuth();
   const [txns, setTxns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({ status: '', service_type: '', date_from: '', date_to: '' });
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [hasNext, setHasNext] = useState(false);
+  const cur = getUserCurrency(user);
 
   const load = useCallback(async (f, p) => {
     setLoading(true);
@@ -127,7 +131,7 @@ export default function TransactionsPage() {
                   {txn.phone ? ` → ${txn.phone}` : ''}
                 </div>
                 <div style={{ fontSize: 12, color: 'var(--gray-500)', marginTop: 2 }}>
-                  {txn.reference} · {new Date(txn.created_at).toLocaleString('en-NG')}
+                  {txn.reference} · {new Date(txn.created_at).toLocaleString(cur.locale)}
                 </div>
                 {txn.provider && (
                   <div style={{ fontSize: 11, color: 'var(--gray-400)', marginTop: 1 }}>
@@ -137,7 +141,7 @@ export default function TransactionsPage() {
               </div>
               <div style={{ textAlign: 'right', flexShrink: 0 }}>
                 <div style={{ fontWeight: 700, fontSize: 15 }}>
-                  ₦{parseFloat(txn.total_amount).toLocaleString()}
+                  {cur.symbol}{parseFloat(txn.total_amount).toLocaleString()}
                 </div>
                 <span className={`badge ${STATUS_MAP[txn.status] || 'badge-gray'}`}>{txn.status}</span>
               </div>

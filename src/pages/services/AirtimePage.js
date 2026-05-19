@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { getNetworks } from '../../api/services';
 import { purchaseAirtime } from '../../api/transactions';
 import { useAuth } from '../../context/AuthContext';
+import { getUserCurrency } from '../../utils/currency';
 import toast from 'react-hot-toast';
 import PinModal from './PinModal';
 import { Phone, AlertCircle, RefreshCw } from 'lucide-react';
@@ -65,6 +66,7 @@ function FieldError({ msg }) {
 
 export default function AirtimePage() {
   const { user, refreshUser } = useAuth();
+  const cur = getUserCurrency(user);
   const [networks, setNetworks] = useState([]);
   const [country, setCountry] = useState('NG');
   const [form, setForm] = useState({ phone: '', network: '', amount: '' });
@@ -260,7 +262,7 @@ export default function AirtimePage() {
           {loading ? <span className="spinner" /> : <><Phone size={16} /> Buy Airtime</>}
         </button>
         <p style={{ fontSize: 12, color: 'var(--gray-500)', textAlign: 'center', marginTop: 12 }}>
-          Wallet balance: ₦{parseFloat(user?.wallet_balance || 0).toLocaleString()}
+          Wallet balance: {cur.symbol}{parseFloat(user?.wallet_balance || 0).toLocaleString()}
         </p>
       </div>
 

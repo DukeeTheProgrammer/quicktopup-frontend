@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { getWallet, fundWallet, getWalletLedger, getFundingStatus } from '../../api/wallet';
+import { useAuth } from '../../context/AuthContext';
+import { getUserCurrency } from '../../utils/currency';
 import toast from 'react-hot-toast';
 import { Wallet, ArrowDownCircle, ArrowUpCircle, Plus, RefreshCw, AlertCircle, CreditCard, Building2, Smartphone, DollarSign, Lock } from 'lucide-react';
 import './Wallet.css';
 
-const FUND_PRESETS = [1000, 2000, 5000, 10000, 20000, 50000];
+const FUND_PRESETS = { NGN: [1000, 2000, 5000, 10000, 20000, 50000], GHS: [10, 20, 50, 100, 200, 500], USD: [10, 20, 50, 100, 200, 500] };
 const PAYMENT_METHODS = [
   { value: 'card', label: 'Card', desc: 'Visa / Mastercard / Verve', icon: CreditCard },
   { value: 'bank_transfer', label: 'Bank Transfer', desc: 'Direct bank transfer', icon: Building2 },
@@ -29,6 +31,7 @@ function parseError(err) {
 }
 
 export default function WalletPage() {
+  const { user } = useAuth();
   const [wallet, setWallet] = useState(null);
   const [ledger, setLedger] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,6 +41,9 @@ export default function WalletPage() {
   const [payMethod, setPayMethod] = useState('card');
   const [funding, setFunding] = useState(false);
   const [tab, setTab] = useState('overview');
+  const cur = getUserCurrency(user);
+  const presets = FUND_PRESETS[cur.code] || FUND_PRESETS.NGN;
+  const minFund = cur.code === 'NGN' ? 100 : 10;
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -127,7 +133,7 @@ export default function WalletPage() {
   const handleFund = async () => {
     const amount = parseFloat(fundAmount);
     if (!fundAmount || isNaN(amount) || amount < 100) {
-      toast.error('Minimum funding amount is ₦100');
+      toast.error(`Minimum funding amount is ${cur.symbol}${minFund}`);
       return;
     }
     setFunding(true);
@@ -144,7 +150,7 @@ export default function WalletPage() {
       const total = parseFloat(data?.total_amount || amount);
       if (fee > 0) {
         toast.success(
-          `Processing fee: ₦${fee.toLocaleString()} · You'll pay ₦${total.toLocaleString()} total`,
+          `Processing fee: ${cur.symbol}${fee.toLocaleString()} · You'll pay ${cur.symbol}${total.toLocaleString()} total`,
           { duration: 5000 }
         );
       }
@@ -201,13 +207,13 @@ export default function WalletPage() {
       <div className="wallet-bal-card">
         <div className="wb-label">Total Balance</div>
         <div className="wb-amount">
-          ₦{parseFloat(wallet?.balance || 0).toLocaleString('en-NG', { minimumFractionDigits: 2 })}
+          {cur.symbol}{parseFloat(wallet?.balance || 0).toLocaleString(cur.locale, { minimumFractionDigits: 2 })}
         </div>
         <div className="wb-avail">
-          Available: ₦{parseFloat(wallet?.available_balance || 0).toLocaleString('en-NG', { minimumFractionDigits: 2 })}
+          Available: {cur.symbol}{parseFloat(wallet?.available_balance || 0).toLocaleString(cur.locale, { minimumFractionDigits: 2 })}
           {parseFloat(wallet?.reserved_balance || 0) > 0 && (
             <span style={{ marginLeft: 10, opacity: 0.75 }}>
-              · Reserved: ₦{parseFloat(wallet.reserved_balance).toLocaleString()}
+              · Reserved: {cur.symbol}{parseFloat(wallet.reserved_balance).toLocaleString()}
             </span>
           )}
         </div>
@@ -229,14 +235,14 @@ export default function WalletPage() {
           <ArrowDownCircle size={22} />
           <div>
             <div className="wstat-label">Total Credited</div>
-            <div className="wstat-val">₦{parseFloat(wallet?.total_credited || 0).toLocaleString()}</div>
+            <div className="wstat-val">{cur.symbol}{parseFloat(wallet?.total_credited || 0).toLocaleString()}</div>
           </div>
         </div>
         <div className="wstat-card debit">
           <ArrowUpCircle size={22} />
           <div>
             <div className="wstat-label">Total Debited</div>
-            <div className="wstat-val">₦{parseFloat(wallet?.total_debited || 0).toLocaleString()}</div>
+            <div className="wstat-val">{cur.symbol}{parseFloat(wallet?.total_debited || 0).toLocaleString()}</div>
           </div>
         </div>
         <div className="wstat-card neutral">
@@ -259,9 +265,9 @@ export default function WalletPage() {
           <h3 style={{ fontWeight: 700, marginBottom: 16 }}>Wallet Details</h3>
           <div className="detail-row"><span>Status</span><span className={`badge ${wallet?.is_active ? 'badge-success' : 'badge-danger'}`}>{wallet?.is_active ? 'Active' : 'Inactive'}</span></div>
           <div className="detail-row"><span>Lock Status</span><span className={`badge ${wallet?.is_locked ? 'badge-danger' : 'badge-success'}`} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>{wallet?.is_locked ? <><Lock size={12} /> Locked</> : <>Unlocked</>}</span></div>
-          <div className="detail-row"><span>Daily Limit</span><span>₦{parseFloat(wallet?.daily_limit || 0).toLocaleString()}</span></div>
-          <div className="detail-row"><span>Monthly Limit</span><span>₦{parseFloat(wallet?.monthly_limit || 0).toLocaleString()}</span></div>
-          <div className="detail-row"><span>Reserved</span><span>₦{parseFloat(wallet?.reserved_balance || 0).toLocaleString()}</span></div>
+          <div className="detail-row"><span>Daily Limit</span><span>{cur.symbol}{parseFloat(wallet?.daily_limit || 0).toLocaleString()}</span></div>
+          <div className="detail-row"><span>Monthly Limit</span><span>{cur.symbol}{parseFloat(wallet?.monthly_limit || 0).toLocaleString()}</span></div>
+          <div className="detail-row"><span>Reserved</span><span>{cur.symbol}{parseFloat(wallet?.reserved_balance || 0).toLocaleString()}</span></div>
           <div className="detail-row"><span>Email</span><span style={{ wordBreak: 'break-all' }}>{wallet?.user_email}</span></div>
         </div>
       )}
@@ -277,13 +283,13 @@ export default function WalletPage() {
               </div>
               <div className="ledger-info">
                 <div className="ledger-desc">{entry.description}</div>
-                <div className="ledger-ref">{entry.reference} · {new Date(entry.created_at).toLocaleDateString('en-NG')}</div>
+                <div className="ledger-ref">{entry.reference} · {new Date(entry.created_at).toLocaleDateString(cur.locale)}</div>
               </div>
               <div className="ledger-right">
                 <div className={`ledger-amount ${entry.entry_type}`}>
-                  {entry.entry_type === 'credit' ? '+' : '-'}₦{parseFloat(entry.amount).toLocaleString()}
+                  {entry.entry_type === 'credit' ? '+' : '-'}{cur.symbol}{parseFloat(entry.amount).toLocaleString()}
                 </div>
-                <div className="ledger-bal">Bal: ₦{parseFloat(entry.balance_after).toLocaleString()}</div>
+                <div className="ledger-bal">Bal: {cur.symbol}{parseFloat(entry.balance_after).toLocaleString()}</div>
               </div>
             </div>
           ))}
@@ -303,9 +309,9 @@ export default function WalletPage() {
             </p>
 
             <div className="form-group">
-              <label className="form-label">Amount (₦)</label>
+              <label className="form-label">Amount ({cur.symbol})</label>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
-                {FUND_PRESETS.map(a => (
+                {presets.map(a => (
                   <button key={a} type="button"
                     style={{
                       padding: '6px 12px', borderRadius: 20, cursor: 'pointer', fontSize: 13, fontWeight: 600,
@@ -314,7 +320,7 @@ export default function WalletPage() {
                       color: fundAmount === String(a) ? 'var(--green)' : 'inherit',
                     }}
                     onClick={() => setFundAmount(String(a))}>
-                    ₦{a.toLocaleString()}
+                    {cur.symbol}{a.toLocaleString()}
                   </button>
                 ))}
               </div>
@@ -323,7 +329,7 @@ export default function WalletPage() {
                 type="number"
                 placeholder="Or enter custom amount"
                 value={fundAmount}
-                min="100"
+                min={minFund}
                 onChange={e => setFundAmount(e.target.value)}
               />
             </div>
@@ -358,7 +364,7 @@ export default function WalletPage() {
                 Cancel
               </button>
               <button className="btn btn-primary btn-full" onClick={handleFund} disabled={funding}>
-                {funding ? <span className="spinner" /> : `Pay ₦${parseFloat(fundAmount || 0).toLocaleString()}`}
+                {funding ? <span className="spinner" /> : `Pay ${cur.symbol}${parseFloat(fundAmount || 0).toLocaleString()}`}
               </button>
             </div>
           </div>

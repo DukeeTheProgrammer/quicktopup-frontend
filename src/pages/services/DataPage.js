@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { getNetworks, getDataPlans } from '../../api/services';
 import { purchaseData } from '../../api/transactions';
 import { useAuth } from '../../context/AuthContext';
+import { getUserCurrency } from '../../utils/currency';
 import toast from 'react-hot-toast';
 import PinModal from './PinModal';
 import { Wifi, AlertCircle, RefreshCw } from 'lucide-react';
@@ -84,6 +85,7 @@ function FieldError({ msg }) {
 
 export default function DataPage() {
   const { user, refreshUser } = useAuth();
+  const cur = getUserCurrency(user);
   const [networks, setNetworks] = useState([]);
   const [plans, setPlans] = useState([]);
   const [country, setCountry] = useState('NG');
@@ -319,7 +321,7 @@ export default function DataPage() {
           {loading ? <span className="spinner" /> : <><Wifi size={16} /> Buy Data</>}
         </button>
         <p style={{ fontSize: 12, color: 'var(--gray-500)', textAlign: 'center', marginTop: 12 }}>
-          Wallet balance: ₦{parseFloat(user?.wallet_balance || 0).toLocaleString()}
+          Wallet balance: {cur.symbol}{parseFloat(user?.wallet_balance || 0).toLocaleString()}
         </p>
       </div>
 

@@ -2,12 +2,13 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { getElectricityBillers } from '../../api/services';
 import { purchaseElectricity } from '../../api/transactions';
 import { useAuth } from '../../context/AuthContext';
+import { getUserCurrency } from '../../utils/currency';
 import toast from 'react-hot-toast';
 import { Zap, AlertCircle, RefreshCw } from 'lucide-react';
 import PinModal from './PinModal';
 import './ServicePage.css';
 
-const PRESETS = [1000, 2000, 5000, 10000, 20000, 50000];
+const PRESETS = { NGN: [1000, 2000, 5000, 10000, 20000, 50000], GHS: [50, 100, 200, 500, 1000, 2000], USD: [10, 20, 50, 100, 200, 500] };
 const METER_TYPES = [
   { value: 'prepaid', label: 'Prepaid' },
   { value: 'postpaid', label: 'Postpaid' },
@@ -52,6 +53,9 @@ function FieldError({ msg }) {
 
 export default function ElectricityPage() {
   const { user, refreshUser } = useAuth();
+  const cur = getUserCurrency(user);
+  const presets = PRESETS[cur.code] || PRESETS.NGN;
+  const minAmt = cur.code === 'NGN' ? 100 : 10;
   const [billers, setBillers] = useState([]);
   const [billersLoading, setBillersLoading] = useState(true);
   const [billersError, setBillersError] = useState(null);
@@ -94,10 +98,10 @@ export default function ElectricityPage() {
     const amt = parseFloat(form.amount);
     if (!form.amount || isNaN(amt)) {
       e.amount = 'Amount is required';
-    } else if (amt < 100) {
-      e.amount = 'Minimum electricity purchase is ₦100';
+    } else if (amt < minAmt) {
+      e.amount = `Minimum electricity purchase is ${cur.symbol}${minAmt}`;
     } else if (amt > parseFloat(user?.wallet_balance || 0)) {
-      e.amount = `Insufficient balance (you have ₦${parseFloat(user?.wallet_balance || 0).toLocaleString()})`;
+      e.amount = `Insufficient balance (you have ${cur.symbol}${parseFloat(user?.wallet_balance || 0).toLocaleString()})`;
     }
     return e;
   };
@@ -119,7 +123,7 @@ export default function ElectricityPage() {
         amount: parseFloat(form.amount),
         pin,
       });
-      toast.success(`₦${parseFloat(form.amount).toLocaleString()} electricity units purchased`);
+      toast.success(`${cur.symbol}${parseFloat(form.amount).toLocaleString()} electricity units purchased`);
       setForm(p => ({ ...p, meter_number: '', amount: '' }));
       setShowPin(false);
       refreshUser();
@@ -202,20 +206,20 @@ export default function ElectricityPage() {
 
         {/* Amount */}
         <div className="form-group">
-          <label className="form-label">Amount (₦)</label>
+          <label className="form-label">Amount ({cur.symbol})</label>
           <div className="amount-presets">
-            {PRESETS.map(a => (
+            {presets.map(a => (
               <button key={a} type="button"
                 className={`preset-btn ${form.amount === String(a) ? 'selected' : ''}`}
                 onClick={() => setField('amount', String(a))}>
-                ₦{a.toLocaleString()}
+                {cur.symbol}{a.toLocaleString()}
               </button>
             ))}
           </div>
           <input
             className={`form-input ${errors.amount ? 'input-error' : ''}`}
-            type="number" placeholder="Or enter custom amount (min ₦100)"
-            value={form.amount} min="100"
+            type="number" placeholder={`Or enter custom amount (min ${cur.symbol}${minAmt})`}
+            value={form.amount} min={minAmt}
             onChange={e => setField('amount', e.target.value)}
           />
           <FieldError msg={errors.amount} />
@@ -225,7 +229,7 @@ export default function ElectricityPage() {
           <div className="summary-box">
             <div className="summary-row"><span>DISCO</span><span>{selectedBiller?.name || form.provider}</span></div>
             <div className="summary-row"><span>Meter</span><span>{form.meter_number} ({form.meter_type})</span></div>
-            <div className="summary-row"><span>Amount</span><span><strong>₦{parseFloat(form.amount || 0).toLocaleString()}</strong></span></div>
+            <div className="summary-row"><span>Amount</span><span><strong>{cur.symbol}{parseFloat(form.amount || 0).toLocaleString()}</strong></span></div>
           </div>
         )}
 
@@ -233,7 +237,7 @@ export default function ElectricityPage() {
           {loading ? <span className="spinner" /> : <><Zap size={16} /> Pay Now</>}
         </button>
         <p style={{ fontSize: 12, color: 'var(--gray-500)', textAlign: 'center', marginTop: 12 }}>
-          Wallet balance: ₦{parseFloat(user?.wallet_balance || 0).toLocaleString()} · Deducted instantly
+          Wallet balance: {cur.symbol}{parseFloat(user?.wallet_balance || 0).toLocaleString()} · Deducted instantly
         </p>
       </div>
 

@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
   const refreshUser = async () => {
     try {
       const res = await getProfile();
-      const u = res.data.data;
+      const u = res.data?.data || res.data;
       setUser(u);
       localStorage.setItem('user', JSON.stringify(u));
     } catch {}
