@@ -107,7 +107,7 @@ export default function Layout({ children }) {
             <div className="avatar sm">{initials}</div>
           </div>
         </header>
-        <main className="main-content">{children}</main>
+        <main className="main-content page-enter">{children}</main>
       </div>
     </div>
   );
