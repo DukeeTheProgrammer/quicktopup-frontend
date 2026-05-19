@@ -4,7 +4,7 @@ import { purchaseAirtime } from '../../api/transactions';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import PinModal from './PinModal';
-import { Phone, AlertCircle, RefreshCw, XCircle, Lock, KeyRound, AlertTriangle } from 'lucide-react';
+import { Phone, AlertCircle, RefreshCw } from 'lucide-react';
 import './ServicePage.css';
 
 const NET_COLORS = {

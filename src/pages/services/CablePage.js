@@ -3,7 +3,7 @@ import { getCablePlans } from '../../api/services';
 import { purchaseCable } from '../../api/transactions';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
-import { Tv, AlertCircle, RefreshCw, XCircle, Lock, KeyRound, AlertTriangle } from 'lucide-react';
+import { Tv, AlertCircle, RefreshCw } from 'lucide-react';
 import PinModal from './PinModal';
 import './ServicePage.css';
 

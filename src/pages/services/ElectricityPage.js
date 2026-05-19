@@ -3,7 +3,7 @@ import { getElectricityBillers } from '../../api/services';
 import { purchaseElectricity } from '../../api/transactions';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
-import { Zap, AlertCircle, RefreshCw, XCircle, Lock, KeyRound, AlertTriangle, ClipboardList } from 'lucide-react';
+import { Zap, AlertCircle, RefreshCw } from 'lucide-react';
 import PinModal from './PinModal';
 import './ServicePage.css';
 
