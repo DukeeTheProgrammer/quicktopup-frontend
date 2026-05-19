@@ -108,7 +108,45 @@
 .txn-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
 .txn-amount { font-size: 14px; font-weight: 700; color: var(--text); }
 
-@media (max-width: 600px) {
-  .service-grid { grid-template-columns: repeat(2, 1fr); }
-  .wallet-balance { font-size: 28px; }
+/* ── Dashboard responsive ── */
+@media (max-width: 768px) {
+  .wallet-hero { padding: 22px 18px; border-radius: 16px; }
+  .wallet-balance { font-size: 30px; }
+  .wallet-stats { gap: 16px; }
+  .service-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .service-card { padding: 16px 10px; font-size: 12px; }
+  .service-icon { width: 44px; height: 44px; border-radius: 12px; }
+  .txn-row { padding: 12px 14px; gap: 10px; }
+}
+@media (max-width: 480px) {
+  .wallet-hero { padding: 18px 16px; }
+  .wallet-balance { font-size: 26px; }
+  .service-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .service-card { padding: 14px 8px; border-radius: 12px; }
+  .txn-desc { font-size: 13px; }
+  .txn-amount { font-size: 13px; }
+  .fund-btn { padding: 9px 16px; font-size: 13px; }
+}
+@media (max-width: 360px) {
+  .wallet-balance { font-size: 22px; }
+  .service-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+}
+
+/* ── Dashboard animations ── */
+.wallet-hero { animation: slideInUp 0.55s cubic-bezier(.22,1,.36,1) both; }
+.service-grid { animation: slideInUp 0.55s cubic-bezier(.22,1,.36,1) 0.1s both; }
+.service-card {
+  transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s;
+}
+.service-card:hover {
+  transform: translateY(-6px) scale(1.04);
+  box-shadow: 0 12px 32px rgba(0,185,107,.15);
+}
+.fund-btn { transition: all 0.25s cubic-bezier(.34,1.56,.64,1); }
+.fund-btn:hover { transform: translateY(-2px) scale(1.03); }
+.txn-row { transition: background 0.15s, transform 0.15s; }
+.txn-row:hover { transform: translateX(3px); }
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
