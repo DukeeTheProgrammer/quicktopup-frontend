@@ -28,7 +28,7 @@ export default function ProfilePage() {
       toast.success('Profile updated!');
     } catch (err) {
       const d = err.response?.data;
-      toast.error(d?.error?.message || d?.message || 'Update failed');
+      toast.error(d?.error?.message || d?.message || d?.detail || 'Update failed');
     } finally { setSaving(false); }
   };
 
@@ -49,7 +49,7 @@ export default function ProfilePage() {
       setPinForm({ new_pin: '', pin_confirm: '' });
     } catch (err) {
       const d = err.response?.data;
-      toast.error(d?.error?.message || d?.message || 'Failed to set PIN');
+      toast.error(d?.error?.message || d?.message || d?.detail || 'Failed to set PIN');
     } finally { setSettingPin(false); }
   };
 

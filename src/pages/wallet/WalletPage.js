@@ -16,7 +16,6 @@ function parseError(err) {
   if (!err) return 'Something went wrong';
   if (err.response) {
     const d = err.response.data;
-    // Try all known error shapes from the API docs
     return (
       d?.error?.message ||
       d?.message ||
@@ -166,6 +165,7 @@ export default function WalletPage() {
         PAYMENT_INIT_FAILED: 'Payment initiation failed. Try a different payment method.',
       };
       toast.error(MAP[errCode] || errMsg);
+      console.error('[Wallet Fund]', err.response?.data);
     } finally {
       setFunding(false);
     }

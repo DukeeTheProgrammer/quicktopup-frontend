@@ -56,7 +56,10 @@ function parseServiceList(r, key) {
 
 function getErrorMsg(err) {
   const code = err.response?.data?.error?.code;
-  const msg = err.response?.data?.error?.message || err.response?.data?.message;
+  const msg = err.response?.data?.error?.message
+    || err.response?.data?.message
+    || err.response?.data?.detail
+    || (typeof err.response?.data === 'string' ? err.response.data : null);
   const MAP = {
     INSUFFICIENT_FUNDS: 'Wallet balance too low. Please fund your wallet first.',
     INVALID_PIN: 'Wrong transaction PIN. Please try again.',
@@ -196,6 +199,7 @@ export default function DataPage() {
       toast.error(getErrorMsg(err));
       const code = err.response?.data?.error?.code;
       if (code === 'INSUFFICIENT_FUNDS') setErrors(p => ({ ...p, plan: 'Insufficient wallet balance' }));
+      console.error('[Data Purchase]', err.response?.data);
     } finally { setLoading(false); }
   };
 

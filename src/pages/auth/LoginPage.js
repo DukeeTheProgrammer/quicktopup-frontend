@@ -37,7 +37,8 @@ export default function LoginPage() {
     } catch (err) {
       if (err.response) {
         const d = err.response.data;
-        const msg = d?.error?.message || d?.message
+        const msg = d?.error?.message
+          || d?.message
           || (typeof d === 'string' ? d : null)
           || `Error ${err.response.status}`;
         toast.error(msg);

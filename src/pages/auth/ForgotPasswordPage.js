@@ -16,9 +16,15 @@ export default function ForgotPasswordPage() {
     try {
       await passwordReset({ email });
       setSent(true);
-      toast.success('Reset email sent!');
+      toast.success('Reset email sent! Check your inbox.');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to send reset email');
+      const msg = err.response?.data?.error?.message
+        || err.response?.data?.message
+        || err.response?.data?.detail
+        || (typeof err.response?.data === 'string' ? err.response.data : null)
+        || 'Could not send reset link. Please try again.';
+      toast.error(msg);
+      console.error('[Forgot Password]', err.response?.data);
     } finally { setLoading(false); }
   };
 

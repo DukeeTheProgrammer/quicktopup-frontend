@@ -37,7 +37,10 @@ function parseServiceList(r, key) {
 function getErrorMsg(err) {
   const e = err.response?.data;
   const code = e?.error?.code;
-  const msg = e?.error?.message || e?.message;
+  const msg = e?.error?.message
+    || e?.message
+    || e?.detail
+    || (typeof e === 'string' ? e : null);
   const MAP = {
     INSUFFICIENT_FUNDS: 'Your wallet balance is too low. Please fund your wallet first.',
     INVALID_PIN: 'Wrong transaction PIN. Please try again.',
@@ -155,6 +158,7 @@ export default function AirtimePage() {
       toast.error(msg);
       const code = err.response?.data?.error?.code;
       if (code === 'INSUFFICIENT_FUNDS') setErrors(p => ({ ...p, amount: 'Insufficient wallet balance' }));
+      console.error('[Airtime Purchase]', err.response?.data);
     } finally { setLoading(false); }
   };
 

@@ -45,17 +45,16 @@ export default function RegisterPage() {
       toast.success('Account created! Welcome!');
       window.location.href = '/dashboard';
     } catch (err) {
-      // Distinguish axios HTTP errors from JS runtime errors
       if (err.response) {
         const d = err.response.data;
-        const msg = d?.error?.message || d?.message
+        const msg = d?.error?.message
+          || d?.message
           || (typeof d === 'string' ? d : null)
           || `Error ${err.response.status}`;
         toast.error(msg);
       } else if (err.request) {
         toast.error('No response from server. Check your connection.');
       } else {
-        // JS runtime error — log it so it's visible in console
         console.error('Register runtime error:', err);
         toast.error('Something went wrong. Please try again.');
       }
