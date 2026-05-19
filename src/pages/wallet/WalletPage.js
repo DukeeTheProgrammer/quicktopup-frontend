@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { getWallet, fundWallet, getWalletLedger, getFundingStatus } from '../../api/wallet';
 import { useAuth } from '../../context/AuthContext';
-import { getUserCurrency } from '../../utils/currency';
+import { getWalletCurrency } from '../../utils/currency';
 import toast from 'react-hot-toast';
 import { Wallet, ArrowDownCircle, ArrowUpCircle, Plus, RefreshCw, AlertCircle, CreditCard, Building2, Smartphone, DollarSign, Lock } from 'lucide-react';
 import './Wallet.css';
@@ -41,7 +41,7 @@ export default function WalletPage() {
   const [payMethod, setPayMethod] = useState('card');
   const [funding, setFunding] = useState(false);
   const [tab, setTab] = useState('overview');
-  const cur = getUserCurrency(user);
+  const cur = getWalletCurrency(wallet, user);
   const presets = FUND_PRESETS[cur.code] || FUND_PRESETS.NGN;
   const minFund = cur.code === 'NGN' ? 100 : 10;
 
