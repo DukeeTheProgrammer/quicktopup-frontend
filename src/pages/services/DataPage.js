@@ -12,11 +12,35 @@ const NET_COLORS = {
   '9MOBILE': '#38a169', ETISALAT: '#38a169',
   VODAFONE: '#e53e3e', AIRTELTIGO: '#e53e3e',
 };
+// ── Phone validation regexes ─────────────────────────────
+// Nigeria: 080/081/090/070/091 (11 digits) OR +234 prefix (13 digits)
+const NG_REGEX = /^(?:0[7-9]\d{9}|\+234[7-9]\d{9})$/;
+// Ghana MTN: +23324/055/059 | Vodafone: +23320/050 | AirtelTigo: +23326/027/057
+const GH_REGEX = /^\+233(?:2[0-46-9]|5[0-79])\d{7}$/;
+
+function validatePhone(phone, countryCode) {
+  const p = phone.trim();
+  if (!p) return 'Phone number is required';
+  if (countryCode === 'NG') {
+    if (!NG_REGEX.test(p)) {
+      if (p.startsWith('+233')) return 'Switch country to Ghana for +233 numbers';
+      return 'Enter a valid Nigerian number — 0801..., 0901..., or +2348...';
+    }
+  } else if (countryCode === 'GH') {
+    if (!GH_REGEX.test(p)) {
+      if (!p.startsWith('+')) return 'Ghana numbers must start with +233 (e.g. +233241234567)';
+      if (p.startsWith('+234')) return 'Switch country to Nigeria for +234 numbers';
+      return 'Enter a valid Ghana number — +233241234567, +233201234567, etc.';
+    }
+  }
+  return null; // valid
+}
+
 const COUNTRIES = [
   { code: 'NG', label: '🇳🇬 Nigeria', currency: '₦',
     placeholder: '08012345678 or +2348012345678' },
   { code: 'GH', label: '🇬🇭 Ghana', currency: 'GH₵',
-    placeholder: '+233241234567', phoneRegex: /^\+233[235]\d{8}$/ },
+    placeholder: '+233241234567' },
 ];
 const GH_CODES = ['vodafone', 'airteltigo'];
 const isGhanaNetwork = (code) => GH_CODES.includes((code || '').toLowerCase());
@@ -99,9 +123,18 @@ export default function DataPage() {
   const handlePhoneChange = (e) => {
     const val = e.target.value;
     setForm(p => ({ ...p, phone: val }));
-    setErrors(p => ({ ...p, phone: '' }));
-    if (val.startsWith('+233')) setCountry('GH');
-    else if (val.startsWith('+234')) setCountry('NG');
+    // Auto-switch country from prefix
+    let newCountry = country;
+    if (val.startsWith('+233')) newCountry = 'GH';
+    else if (val.startsWith('+234')) newCountry = 'NG';
+    if (newCountry !== country) setCountry(newCountry);
+    // Live validation (only if user has typed enough to evaluate)
+    if (val.length >= 10) {
+      const err = validatePhone(val, newCountry);
+      setErrors(p => ({ ...p, phone: err || '' }));
+    } else {
+      setErrors(p => ({ ...p, phone: '' }));
+    }
   };
 
   const selectNetwork = async (code) => {
@@ -125,13 +158,8 @@ export default function DataPage() {
   const validate = () => {
     const e = {};
     if (!form.network) e.network = 'Please select a network';
-    if (!form.phone.trim()) {
-      e.phone = 'Phone number is required';
-    } else if (country === 'GH' && selectedCountry.phoneRegex && !selectedCountry.phoneRegex.test(form.phone.trim())) {
-      e.phone = `Enter a valid Ghana number (e.g. ${selectedCountry.placeholder})`;
-    } else if (form.phone.trim().length < 7) {
-      e.phone = 'Phone number is too short';
-    }
+    const phoneErr = validatePhone(form.phone, country);
+    if (phoneErr) e.phone = phoneErr;
     if (!form.plan_id) e.plan = 'Please select a data plan';
     if (selectedPlan) {
       const price = parseFloat(selectedPlan.amount || selectedPlan.selling_price || 0);
