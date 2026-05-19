@@ -90,6 +90,65 @@ function useInView(threshold = 0.15) {
   return [ref, inView];
 }
 
+/* ─── Animated number counter ─── */
+function useCountUp(target, inView, duration = 1800) {
+  const [val, setVal] = React.useState(0);
+  React.useEffect(() => {
+    if (!inView) return;
+    let start = null;
+    const numeric = parseFloat(String(target).replace(/[^0-9.]/g, ''));
+    const suffix = String(target).replace(/[0-9.]/g, '');
+    const step = (ts) => {
+      if (!start) start = ts;
+      const progress = Math.min((ts - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setVal(Math.floor(eased * numeric) + suffix);
+      if (progress < 1) requestAnimationFrame(step);
+      else setVal(target);
+    };
+    requestAnimationFrame(step);
+  }, [inView, target, duration]);
+  return val;
+}
+
+/* ─── Typewriter effect ─── */
+function Typewriter({ words, speed = 90, pause = 1800 }) {
+  const [idx, setIdx] = React.useState(0);
+  const [text, setText] = React.useState('');
+  const [deleting, setDeleting] = React.useState(false);
+  React.useEffect(() => {
+    const word = words[idx % words.length];
+    const timeout = setTimeout(() => {
+      if (!deleting) {
+        setText(word.slice(0, text.length + 1));
+        if (text.length + 1 === word.length) setTimeout(() => setDeleting(true), pause);
+      } else {
+        setText(word.slice(0, text.length - 1));
+        if (text.length - 1 === 0) { setDeleting(false); setIdx(i => i + 1); }
+      }
+    }, deleting ? speed / 2 : speed);
+    return () => clearTimeout(timeout);
+  }, [text, deleting, idx, words, speed, pause]);
+  return (
+    <em style={{ borderRight: '3px solid', paddingRight: 2, animation: 'typewriterBlink 0.8s step-end infinite' }}>
+      {text || ' '}
+    </em>
+  );
+}
+
+/* ─── Animated stat ─── */
+function AnimStat({ num, label, inView }) {
+  const val = useCountUp(num, inView);
+  return (
+    <div className="lp-stat">
+      <span className="lp-stat-num">{inView ? val : '0'}</span>
+      <span className="lp-stat-label">{label}</span>
+    </div>
+  );
+}
+
+
+
 /* ─── FAQ Item ─── */
 function FaqItem({ q, a, i }) {
   const [open, setOpen] = useState(false);
@@ -174,7 +233,7 @@ export default function LandingPage() {
           </div>
           <h1>
             Nigeria <span className="amp">&amp;</span> Ghana's<br />
-            <em>Fastest VTU</em><br />Platform
+            <Typewriter words={["Fastest VTU", "Airtime & Data", "Cable & Power", "Secure Wallet"]} /><br />Platform
           </h1>
           <p>
             Airtime, data, cable TV, and electricity — all from one secure wallet.
@@ -191,10 +250,7 @@ export default function LandingPage() {
         {/* ── Stats strip ── */}
         <div className={`lp-hero-stats ${statsIn ? 'fade-up-in' : 'fade-up-out'}`} ref={statsRef}>
           {STATS.map((s, i) => (
-            <div className="lp-stat" key={s.label} style={{ '--i': i }}>
-              <span className="lp-stat-num">{s.num}</span>
-              <span className="lp-stat-label">{s.label}</span>
-            </div>
+            <AnimStat key={s.label} num={s.num} label={s.label} inView={statsIn} delay={i * 120} />
           ))}
         </div>
 
