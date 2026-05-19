@@ -111,7 +111,7 @@ export default function TransactionsPage() {
           <p>No transactions found</p>
         </div>
       ) : (
-        <div style={{ background: 'white', borderRadius: 16, overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
+        <div style={{ background: 'var(--bg-card)', borderRadius: 16, overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
           {txns.map(txn => (
             <div key={txn.id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 20px', borderBottom: '1px solid var(--gray-100)' }}>
               <div style={{ fontSize: 24, flexShrink: 0 }}>{SERVICE_ICONS[txn.service_type] || '💳'}</div>
