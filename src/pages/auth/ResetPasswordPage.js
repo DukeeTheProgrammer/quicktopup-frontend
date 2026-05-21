@@ -24,7 +24,7 @@ export default function ResetPasswordPage() {
         new_password: form.new_password,
         new_password_confirm: form.new_password_confirm,
       });
-      toast.success('Password reset! Please log in.');
+      toast.success('Password reset! Please log in.', { duration: 6000 });
       navigate('/login');
     } catch (err) {
       const msg = err.response?.data?.error?.message

@@ -123,7 +123,7 @@ export default function ElectricityPage() {
         amount: parseFloat(form.amount),
         pin,
       });
-      toast.success(`${cur.symbol}${parseFloat(form.amount).toLocaleString()} electricity units purchased`);
+      toast.success(`${cur.symbol}${parseFloat(form.amount).toLocaleString()} electricity units purchased`, { duration: 6000 });
       setForm(p => ({ ...p, meter_number: '', amount: '' }));
       setShowPin(false);
       refreshUser();

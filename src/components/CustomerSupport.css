@@ -213,12 +213,10 @@
   .cs-fab { right: 16px; bottom: 16px; }
 }
 
-/* ══════════ CUSTOMER SUPPORT DARK THEME ══════════ */
+/* ═════════ CUSTOMER SUPPORT DARK THEME ══════════ */
 [data-theme="dark"] .cs-widget {
-  box-shadow: 0 8px 40px rgba(0,0,0,0.55);
-}
-[data-theme="dark"] .cs-body {
   background: var(--bg-card);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.55);
 }
 [data-theme="dark"] .cs-messages {
   background: var(--bg);
@@ -226,42 +224,40 @@
 [data-theme="dark"] .cs-messages::-webkit-scrollbar-thumb {
   background: var(--gray-300);
 }
-[data-theme="dark"] .cs-msg.bot {
-  background: var(--bg-card);
-  color: var(--text);
-  border: 1px solid var(--border);
+[data-theme="dark"] .cs-bot-avatar {
+  background: var(--gray-200);
 }
-[data-theme="dark"] .cs-msg.user {
+[data-theme="dark"] .cs-bubble-bot {
+  background: var(--gray-200);
+  color: var(--text);
+}
+[data-theme="dark"] .cs-bubble-user {
   background: linear-gradient(135deg, #00875a, #00b96b);
   color: white;
 }
-[data-theme="dark"] .cs-msg-time {
-  color: var(--text-muted);
-}
 [data-theme="dark"] .cs-quick-topics {
   background: var(--bg-card);
-  border-top: 1px solid var(--border);
 }
 [data-theme="dark"] .cs-quick-label {
   color: var(--text-muted);
 }
-[data-theme="dark"] .cs-topic-chip {
+[data-theme="dark"] .cs-topic-btn {
   background: var(--gray-200);
   border-color: var(--border);
   color: var(--text);
 }
-[data-theme="dark"] .cs-topic-chip:hover {
+[data-theme="dark"] .cs-topic-btn:hover {
   background: var(--green-light);
   border-color: var(--green);
   color: var(--green);
 }
 [data-theme="dark"] .cs-input-row {
   background: var(--bg-card);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--gray-200);
 }
 [data-theme="dark"] .cs-input {
   background: var(--bg-input);
-  border-color: var(--border-input);
+  border-color: var(--gray-300);
   color: var(--text);
 }
 [data-theme="dark"] .cs-input::placeholder {
@@ -271,13 +267,9 @@
   border-color: var(--green);
   background: var(--bg-input);
 }
-[data-theme="dark"] .cs-typing-dot {
-  background: var(--text-muted);
+[data-theme="dark"] .cs-icon-btn {
+  background: rgba(255,255,255,0.12);
 }
-[data-theme="dark"] .cs-reset-btn {
-  color: var(--text-muted);
-}
-[data-theme="dark"] .cs-reset-btn:hover {
-  color: var(--text);
-  background: var(--gray-200);
+[data-theme="dark"] .cs-icon-btn:hover {
+  background: rgba(255,255,255,0.22);
 }

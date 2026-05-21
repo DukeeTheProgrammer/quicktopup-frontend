@@ -42,7 +42,7 @@ export default function RegisterPage() {
       localStorage.setItem('auth_token', token);
       localStorage.setItem('user', JSON.stringify(user));
       loginUser(user, token);
-      toast.success('Account created! Welcome!');
+      toast.success('Account created! Welcome!', { duration: 5000 });
       window.location.href = '/dashboard';
     } catch (err) {
       if (err.response) {

@@ -16,7 +16,7 @@ export default function ForgotPasswordPage() {
     try {
       await passwordReset({ email });
       setSent(true);
-      toast.success('Reset email sent! Check your inbox.');
+      toast.success('Reset email sent! Check your inbox.', { duration: 6000 });
     } catch (err) {
       const msg = err.response?.data?.error?.message
         || err.response?.data?.message

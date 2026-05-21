@@ -25,7 +25,7 @@ export default function ProfilePage() {
     try {
       await updateProfile({ first_name: form.first_name, last_name: form.last_name, phone: form.phone });
       await refreshUser();
-      toast.success('Profile updated!');
+      toast.success('Profile updated!', { duration: 5000 });
     } catch (err) {
       const d = err.response?.data;
       toast.error(d?.error?.message || d?.message || d?.detail || 'Update failed');
@@ -45,7 +45,7 @@ export default function ProfilePage() {
     setSettingPin(true);
     try {
       await setPin({ new_pin: pinForm.new_pin, pin_confirm: pinForm.pin_confirm });
-      toast.success('Transaction PIN set successfully!');
+      toast.success('Transaction PIN set successfully!', { duration: 5000 });
       setPinForm({ new_pin: '', pin_confirm: '' });
     } catch (err) {
       const d = err.response?.data;

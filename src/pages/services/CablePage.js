@@ -120,7 +120,7 @@ export default function CablePage() {
         plan_id: selectedPlan.id || selectedPlan.plan_code,
         pin,
       });
-      toast.success(`${selectedPlan.name} subscription successful`);
+      toast.success(`${selectedPlan.name} subscription successful`, { duration: 6000 });
       setSmartCard('');
       setSelectedPlan(null);
       setShowPin(false);

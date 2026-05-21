@@ -32,7 +32,7 @@ export default function LoginPage() {
       localStorage.setItem('auth_token', token);
       localStorage.setItem('user', JSON.stringify(user));
       loginUser(user, token);
-      toast.success(`Welcome back, ${user?.first_name || 'there'}!`);
+      toast.success(`Welcome back, ${user?.first_name || 'there'}!`, { duration: 5000 });
       window.location.href = '/dashboard';
     } catch (err) {
       if (err.response) {

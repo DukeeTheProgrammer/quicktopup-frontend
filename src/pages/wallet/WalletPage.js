@@ -43,7 +43,7 @@ export default function WalletPage() {
   const [tab, setTab] = useState('overview');
   const cur = getWalletCurrency(wallet, user);
   const presets = FUND_PRESETS[cur.code] || FUND_PRESETS.NGN;
-  const minFund = cur.code === 'NGN' ? 100 : 10;
+  const minFund = cur.code === 'GHS' ? 10 : 100;
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -107,7 +107,7 @@ export default function WalletPage() {
           const fundStatus = r.data?.data?.funding?.status;
           if (fundStatus === 'completed') {
             clearInterval(interval);
-            toast.success('Wallet funded successfully!', { id: 'fund-poll' });
+            toast.success('Wallet funded successfully!', { id: 'fund-poll', duration: 6000 });
             loadData();
           } else if (fundStatus === 'failed') {
             clearInterval(interval);
@@ -151,7 +151,7 @@ export default function WalletPage() {
       if (fee > 0) {
         toast.success(
           `Processing fee: ${cur.symbol}${fee.toLocaleString()} · You'll pay ${cur.symbol}${total.toLocaleString()} total`,
-          { duration: 5000 }
+          { duration: 8000 }
         );
       }
       const paymentLink = data?.payment_link;
@@ -159,7 +159,7 @@ export default function WalletPage() {
         setTimeout(() => { window.location.href = paymentLink; }, fee > 0 ? 2000 : 0);
         setShowFund(false);
       } else {
-        toast.success(`Funding initiated! Reference: ${data?.reference || 'N/A'}`);
+        toast.success(`Funding initiated! Reference: ${data?.reference || 'N/A'}`, { duration: 6000 });
         setShowFund(false);
         loadData();
       }

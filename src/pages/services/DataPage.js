@@ -192,7 +192,7 @@ export default function DataPage() {
         amount: parseFloat(selectedPlan?.amount || selectedPlan?.selling_price || 0),
         pin,
       });
-      toast.success(`${selectedPlan?.name} sent to ${form.phone}`);
+      toast.success(`${selectedPlan?.name} sent to ${form.phone}`, { duration: 6000 });
       setForm(p => ({ ...p, plan_id: null }));
       setSelectedPlan(null);
       setShowPin(false);

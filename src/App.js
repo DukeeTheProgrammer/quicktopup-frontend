@@ -65,7 +65,7 @@ function App() {
     <ThemeProvider>
     <AuthProvider>
       <BrowserRouter>
-        <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
+        <Toaster position="top-right" toastOptions={{ duration: 6000 }} />
         <AppRoutes />
         {/* Customer support widget — global overlay, works on every page */}
         <CustomerSupport />

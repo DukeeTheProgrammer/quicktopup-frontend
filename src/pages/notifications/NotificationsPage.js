@@ -24,7 +24,7 @@ export default function NotificationsPage() {
     try {
       await markNotificationRead(id);
       setNotifs(prev => prev.map(n => n.id === id ? { ...n, status: 'read' } : n));
-      toast.success('Marked as read');
+      toast.success('Marked as read', { duration: 4000 });
     } catch { toast.error('Failed'); }
   };
 

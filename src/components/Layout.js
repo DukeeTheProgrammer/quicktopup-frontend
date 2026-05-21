@@ -33,7 +33,7 @@ export default function Layout({ children }) {
   const handleLogout = async () => {
     try { await logout(); } catch {}
     logoutUser();
-    toast.success('Logged out successfully');
+    toast.success('Logged out successfully', { duration: 5000 });
     navigate('/login');
   };
 

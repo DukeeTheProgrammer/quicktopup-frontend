@@ -151,7 +151,7 @@ export default function AirtimePage() {
         amount: parseFloat(form.amount),
         pin,
       });
-      toast.success(`${selectedCountry.currency}${parseFloat(form.amount).toLocaleString()} airtime sent to ${form.phone}`);
+      toast.success(`${selectedCountry.currency}${parseFloat(form.amount).toLocaleString()} airtime sent to ${form.phone}`, { duration: 6000 });
       setForm(p => ({ ...p, amount: '' }));
       setShowPin(false);
       refreshUser();
