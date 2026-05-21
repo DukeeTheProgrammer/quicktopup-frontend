@@ -4,6 +4,14 @@ const CURRENCY_MAP = {
   USD: { symbol: '$', code: 'USD', label: 'Dollars', locale: 'en-US' },
 };
 
+// Exchange rates relative to NGN (base currency)
+// These are approximate and should be updated periodically
+const EXCHANGE_RATES = {
+  NGN: 1,
+  GHS: 11.5,  // 1 GHS ≈ 11.5 NGN
+  USD: 1550,  // 1 USD ≈ 1550 NGN
+};
+
 export function getCurrency(currencyCode) {
   return CURRENCY_MAP[currencyCode] || CURRENCY_MAP.USD;
 }
@@ -18,8 +26,21 @@ export function getWalletCurrency(wallet, user) {
   return getCurrency(code);
 }
 
-export function formatCurrency(amount, user) {
-  const { symbol } = getUserCurrency(user);
+export function convertAmount(amount, fromCurrency, toCurrency) {
+  const fromRate = EXCHANGE_RATES[fromCurrency] || 1;
+  const toRate = EXCHANGE_RATES[toCurrency] || 1;
+  const amountInNGN = parseFloat(amount || 0) * fromRate;
+  return amountInNGN / toRate;
+}
+
+export function formatCurrency(amount, user, displayCurrency) {
+  const cur = displayCurrency ? getCurrency(displayCurrency) : getUserCurrency(user);
   const num = parseFloat(amount || 0);
-  return `${symbol}${num.toLocaleString()}`;
+  return `${cur.symbol}${num.toLocaleString()}`;
+}
+
+export function formatConvertedCurrency(amount, fromCurrency, toCurrency) {
+  const converted = convertAmount(amount, fromCurrency, toCurrency);
+  const cur = getCurrency(toCurrency);
+  return `${cur.symbol}${converted.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
 }
