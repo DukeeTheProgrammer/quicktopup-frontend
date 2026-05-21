@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { getWallet } from '../../api/wallet';
 import { getTransactions } from '../../api/transactions';
 import { useAuth } from '../../context/AuthContext';
-import { getUserCurrency } from '../../utils/currency';
+import { getWalletCurrency } from '../../utils/currency';
 import { Phone, Wifi, Tv, Zap, Plus, ArrowUpRight, ArrowDownLeft, RefreshCw, Eye, EyeOff, Hand } from 'lucide-react';
 import './Dashboard.css';
 
@@ -30,7 +30,7 @@ export default function DashboardPage() {
   const [txns, setTxns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showBal, setShowBal] = useState(true);
-  const cur = getUserCurrency(user);
+  const cur = getWalletCurrency(wallet, user);
 
   useEffect(() => {
     const load = async () => {
