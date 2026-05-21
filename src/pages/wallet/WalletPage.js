@@ -132,7 +132,7 @@ export default function WalletPage() {
 
   const handleFund = async () => {
     const amount = parseFloat(fundAmount);
-    if (!fundAmount || isNaN(amount) || amount < 100) {
+    if (!fundAmount || isNaN(amount) || amount < minFund) {
       toast.error(`Minimum funding amount is ${cur.symbol}${minFund}`);
       return;
     }
