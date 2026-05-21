@@ -303,7 +303,7 @@ export default function WalletPage() {
           onClick={(e) => { if (e.target === e.currentTarget) setShowFund(false); }}
         >
           <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 32, width: '100%', maxWidth: 420 }}>
-            <h3 style={{ fontWeight: 800, marginBottom: 6 }}>Fund Wallet</h3>
+            <h3 style={{ fontWeight: 800, marginBottom: 6, color: 'var(--text)' }}>Fund Wallet</h3>
             <p style={{ fontSize: 13, color: 'var(--gray-500)', marginBottom: 24 }}>
               Powered by Flutterwave — secure, instant payment
             </p>
@@ -316,8 +316,8 @@ export default function WalletPage() {
                     style={{
                       padding: '6px 12px', borderRadius: 20, cursor: 'pointer', fontSize: 13, fontWeight: 600,
                       border: `1.5px solid ${fundAmount === String(a) ? 'var(--green)' : 'var(--gray-300)'}`,
-                      background: fundAmount === String(a) ? 'var(--green-light)' : 'white',
-                      color: fundAmount === String(a) ? 'var(--green)' : 'inherit',
+                      background: fundAmount === String(a) ? 'var(--green-light)' : 'var(--bg-card)',
+                      color: fundAmount === String(a) ? 'var(--green)' : 'var(--text)',
                     }}
                     onClick={() => setFundAmount(String(a))}>
                     {cur.symbol}{a.toLocaleString()}
@@ -343,7 +343,8 @@ export default function WalletPage() {
                       display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
                       borderRadius: 12, cursor: 'pointer',
                       border: `1.5px solid ${payMethod === m.value ? 'var(--green)' : 'var(--gray-200)'}`,
-                      background: payMethod === m.value ? 'var(--green-light)' : '#fff',
+                      background: payMethod === m.value ? 'var(--green-light)' : 'var(--bg-card)',
+                      color: 'var(--text)',
                     }}>
                     <input type="radio" name="payMethod" value={m.value}
                       checked={payMethod === m.value}
@@ -351,7 +352,7 @@ export default function WalletPage() {
                       style={{ accentColor: 'var(--green)' }} />
                     <m.icon size={18} style={{ color: payMethod === m.value ? 'var(--green)' : 'var(--gray-400)' }} />
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: 14 }}>{m.label}</div>
+                      <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--text)' }}>{m.label}</div>
                       <div style={{ fontSize: 12, color: 'var(--gray-500)' }}>{m.desc}</div>
                     </div>
                   </label>
