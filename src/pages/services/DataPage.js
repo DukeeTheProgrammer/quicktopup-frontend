@@ -185,31 +185,19 @@ export default function DataPage() {
   const confirmPurchase = async (pin) => {
     setLoading(true);
     try {
-      const payload = {
+      await purchaseData({
         phone: form.phone.trim(),
         network: form.network.toLowerCase(),
         plan_code: selectedPlan?.plan_code || form.plan_id,
         amount: parseFloat(selectedPlan?.amount || selectedPlan?.selling_price || 0),
         pin,
-      };
-      console.log('=== DATA PURCHASE REQUEST ===');
-      console.log('URL: POST /api/transactions/data/');
-      console.log('Payload:', JSON.stringify(payload, null, 2));
-      console.log('Selected Plan Object:', selectedPlan);
-      console.log('Form State:', form);
-      console.log('===========================');
-      await purchaseData(payload);
-      console.log('=== DATA PURCHASE SUCCESS ===');
+      });
       toast.success(`${selectedPlan?.name} sent to ${form.phone}`, { duration: 6000 });
       setForm(p => ({ ...p, plan_id: null }));
       setSelectedPlan(null);
       setShowPin(false);
       refreshUser();
     } catch (err) {
-      console.log('=== DATA PURCHASE ERROR ===');
-      console.log('Status:', err.response?.status);
-      console.log('Error Data:', JSON.stringify(err.response?.data, null, 2));
-      console.log('==========================');
       toast.error(getErrorMsg(err));
       const code = err.response?.data?.error?.code;
       if (code === 'INSUFFICIENT_FUNDS') setErrors(p => ({ ...p, plan: 'Insufficient wallet balance' }));
