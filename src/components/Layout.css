@@ -59,6 +59,23 @@
 .nav-arrow { margin-left: auto; opacity: 0; transition: opacity 0.2s; }
 .nav-item:hover .nav-arrow,
 .nav-item.active .nav-arrow { opacity: 1; }
+.nav-unread-badge {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  margin-left: auto;
+  box-shadow: 0 0 0 2px var(--bg-sidebar);
+}
+.nav-item.has-unread .nav-arrow { margin-left: 0; }
 
 /* ── Sidebar footer ──────────────────────────────────────────── */
 .sidebar-footer {

@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { logout } from '../api/auth';
+import { getNotifications } from '../api/notifications';
 import toast from 'react-hot-toast';
 import { getUserCurrency } from '../utils/currency';
 import {
@@ -28,7 +29,35 @@ export default function Layout({ children }) {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const cur = getUserCurrency(user);
+
+  const loadUnreadNotifications = async () => {
+    try {
+      const res = await getNotifications();
+      const raw = res.data?.data || res.data;
+      const notifications = raw?.results || (Array.isArray(raw) ? raw : []);
+      const unreadCount = notifications.filter(n => n.status !== 'read' && !n.read_at).length;
+      setUnreadNotifications(unreadCount);
+    } catch {
+      setUnreadNotifications(0);
+    }
+  };
+
+  useEffect(() => {
+    loadUnreadNotifications();
+    window.addEventListener('focus', loadUnreadNotifications);
+    window.addEventListener('notifications:changed', loadUnreadNotifications);
+    return () => {
+      window.removeEventListener('focus', loadUnreadNotifications);
+      window.removeEventListener('notifications:changed', loadUnreadNotifications);
+    };
+  }, []);
+
+  const notificationBadge = useMemo(() => {
+    if (unreadNotifications === 0) return null;
+    return unreadNotifications > 99 ? '99+' : unreadNotifications;
+  }, [unreadNotifications]);
 
   const handleLogout = async () => {
     try { await logout(); } catch {}
@@ -59,10 +88,19 @@ export default function Layout({ children }) {
 
         <nav className="sidebar-nav">
           {navItems.map(({ to, icon: Icon, label }) => (
-            <NavLink key={to} to={to} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+            <NavLink key={to} to={to} className={({ isActive }) => {
+              const activeClass = isActive ? 'active' : '';
+              const unreadClass = to === '/notifications' && notificationBadge ? 'has-unread' : '';
+              return `nav-item ${activeClass} ${unreadClass}`.trim();
+            }}
               onClick={() => setSidebarOpen(false)}>
               <Icon size={18} />
               <span>{label}</span>
+              {to === '/notifications' && notificationBadge && (
+                <span className="nav-unread-badge" aria-label={`${unreadNotifications} unread notifications`}>
+                  {notificationBadge}
+                </span>
+              )}
               <ChevronRight size={14} className="nav-arrow" />
             </NavLink>
           ))}
