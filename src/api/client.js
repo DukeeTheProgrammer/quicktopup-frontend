@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://unmade-backboned-agreeably.ngrok-free.dev/api';
+const BASE_URL = 'https://bydcarss.com/api';
 
 const client = axios.create({
   baseURL: BASE_URL,
