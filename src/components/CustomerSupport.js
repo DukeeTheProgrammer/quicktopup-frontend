@@ -66,7 +66,6 @@ function findSmallTalk(rawInput) {
   const lower = rawInput.toLowerCase().replace(/[^a-z0-9'\s]/g, ' ').trim();
   for (const entry of SMALL_TALK) {
     for (const pattern of entry.patterns) {
-      // Exact match or contained
       if (lower === pattern || lower.includes(pattern)) {
         return typeof entry.respond === 'function' ? entry.respond() : entry.respond;
       }
@@ -163,17 +162,6 @@ const FAQ = [
     q: 'Can I get a refund for a wrong transaction?',
     a: 'If you entered the wrong number and the transaction was successful, we\'ll try our best to help. Contact us at quicktopup.it.com@gmail.com within 24 hours with your transaction reference. Note: refunds depend on the service provider\'s policy.',
   },
-];
-
-const QUICK_TOPICS = [
-  { label: 'Fund Wallet', id: 'wallet_fund', icon: Wallet },
-  { label: 'Buy Airtime', id: 'airtime_buy', icon: Phone },
-  { label: 'Buy Data', id: 'data_buy', icon: Wifi },
-  { label: 'Cable TV', id: 'cable_sub', icon: Tv },
-  { label: 'Transaction PIN', id: 'pin_set', icon: KeyRound },
-  { label: 'Transaction Failed', id: 'failed_txn', icon: XCircle },
-  { label: 'Wallet Locked', id: 'wallet_locked', icon: Lock },
-  { label: 'Processing Fee', id: 'fund_fee', icon: DollarSign },
   {
     id: 'fetch_failed',
     patterns: ['plans not loading', 'networks not showing', 'cant see plans', 'empty list', 'no networks', 'no billers', 'fetch failed', 'service unavailable', 'provider down'],
@@ -191,15 +179,24 @@ const QUICK_TOPICS = [
     patterns: ['fee', 'processing fee', 'charge', 'extra charge', '3 percent', 'why am i paying more', 'total amount'],
     q: 'Why is the total amount higher than what I entered?',
     a: "A 3% processing fee is added to all wallet funding by Flutterwave (our payment processor). Your wallet is credited with the original amount you entered — only the Flutterwave checkout total includes the fee.",
-  },
+  }
+];
+
+const QUICK_TOPICS = [
+  { label: 'Fund Wallet', id: 'wallet_fund', icon: Wallet },
+  { label: 'Buy Airtime', id: 'airtime_buy', icon: Phone },
+  { label: 'Buy Data', id: 'data_buy', icon: Wifi },
+  { label: 'Cable TV', id: 'cable_sub', icon: Tv },
+  { label: 'Transaction PIN', id: 'pin_set', icon: KeyRound },
+  { label: 'Transaction Failed', id: 'failed_txn', icon: XCircle },
+  { label: 'Wallet Locked', id: 'wallet_locked', icon: Lock },
+  { label: 'Processing Fee', id: 'fund_fee', icon: DollarSign },
+  { label: 'Fetch Failed', id: 'fetch_failed', icon: HelpCircle }
 ];
 
 // ─────────────────────────────────────────
-// ─────────────────────────────────────────
 // Smart multi-strategy matcher
 // ─────────────────────────────────────────
-
-// Common synonyms and alternate phrasings mapped to canonical keywords
 const SYNONYMS = {
   'recharge': ['airtime', 'top up'],
   'credit':   ['airtime', 'fund', 'wallet'],
@@ -268,7 +265,6 @@ const SYNONYMS = {
   'email':    ['contact'],
 };
 
-// Levenshtein distance for typo tolerance (only for short words)
 function levenshtein(a, b) {
   if (Math.abs(a.length - b.length) > 3) return 99;
   const m = a.length, n = b.length;
@@ -282,21 +278,17 @@ function levenshtein(a, b) {
   return dp[m][n];
 }
 
-// Expand input with synonyms
 function expandInput(lower) {
   const words = lower.split(/\s+/);
   const extras = new Set();
-  // single word synonyms
   for (const w of words) {
     if (SYNONYMS[w]) SYNONYMS[w].forEach(s => extras.add(s));
-    // partial match on synonym keys (e.g. "recharging" matches "recharge")
     for (const [key, vals] of Object.entries(SYNONYMS)) {
       if (w.length >= 4 && (key.startsWith(w) || w.startsWith(key.slice(0, 4)))) {
         vals.forEach(s => extras.add(s));
       }
     }
   }
-  // multi-word synonym keys
   for (const [key, vals] of Object.entries(SYNONYMS)) {
     if (key.includes(' ') && lower.includes(key)) {
       vals.forEach(s => extras.add(s));
@@ -320,27 +312,23 @@ function findAnswer(rawInput) {
     for (const pattern of faq.patterns) {
       const pat = pattern.toLowerCase();
 
-      // 1. Exact phrase match in expanded input (highest weight)
       if (expanded.includes(pat)) {
         score += pat.split(' ').length * 3;
         continue;
       }
 
-      // 2. All words of pattern present somewhere in expanded
       const patWords = pat.split(' ');
       if (patWords.length > 1 && patWords.every(pw => expanded.includes(pw))) {
         score += patWords.length * 2;
         continue;
       }
 
-      // 3. Single-word typo tolerance for words >= 5 chars
       for (const w of words) {
         if (w.length >= 5 && pat.length >= 5) {
           const dist = levenshtein(w, pat);
           if (dist <= 1) { score += 2; break; }
           if (dist <= 2 && Math.max(w.length, pat.length) > 6) { score += 1; break; }
         }
-        // 4. Partial word match (e.g. "electri" matches "electricity")
         if (w.length >= 5 && pat.length >= 5 && (pat.startsWith(w) || w.startsWith(pat.slice(0,5)))) {
           score += 1; break;
         }
@@ -350,12 +338,11 @@ function findAnswer(rawInput) {
     if (score > bestScore) { bestScore = score; best = faq; }
   }
 
-  // Require a minimum score to avoid false positives
   return bestScore >= 2 ? best : null;
 }
 
 // ─────────────────────────────────────────
-// Component
+// Component Definition
 // ─────────────────────────────────────────
 export default function CustomerSupport() {
   const [open, setOpen] = useState(false);
@@ -364,23 +351,20 @@ export default function CustomerSupport() {
     { from: 'bot', text: 'Hi! I\'m QuickTopUp support. How can I help you today?', id: 0 },
   ]);
   const [input, setInput] = useState('');
-  const [pos, setPos] = useState({ x: null, y: null }); // null = default CSS position
+  const [pos, setPos] = useState({ x: null, y: null }); 
   const [dragging, setDragging] = useState(false);
   const dragOffset = useRef({ x: 0, y: 0 });
   const widgetRef = useRef(null);
   const messagesEndRef = useRef(null);
   const msgId = useRef(1);
 
-  // Auto-scroll to bottom
   useEffect(() => {
     if (open && !minimised) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, open, minimised]);
 
-  // ── Dragging ──────────────────────────────
   const onMouseDown = useCallback((e) => {
-    // Only drag on header
     setDragging(true);
     const rect = widgetRef.current.getBoundingClientRect();
     dragOffset.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
@@ -392,7 +376,6 @@ export default function CustomerSupport() {
     const onMove = (e) => {
       const x = e.clientX - dragOffset.current.x;
       const y = e.clientY - dragOffset.current.y;
-      // Clamp to viewport
       const maxX = window.innerWidth - (widgetRef.current?.offsetWidth || 340);
       const maxY = window.innerHeight - (widgetRef.current?.offsetHeight || 60);
       setPos({ x: Math.max(0, Math.min(x, maxX)), y: Math.max(0, Math.min(y, maxY)) });
@@ -400,7 +383,7 @@ export default function CustomerSupport() {
     const onUp = () => setDragging(false);
     window.addEventListener('mousemove', onMove);
     window.addEventListener('mouseup', onUp);
-    // Touch support
+    
     const onTouchMove = (e) => onMove(e.touches[0]);
     const onTouchEnd = () => setDragging(false);
     window.addEventListener('touchmove', onTouchMove, { passive: false });
@@ -413,7 +396,6 @@ export default function CustomerSupport() {
     };
   }, [dragging]);
 
-  // ── Messaging ─────────────────────────────
   const addMsg = (from, text) => {
     const id = msgId.current++;
     setMessages(p => [...p, { from, text, id }]);
@@ -427,13 +409,11 @@ export default function CustomerSupport() {
     addMsg('user', text);
 
     setTimeout(() => {
-      // 1. Check small talk / greetings first
       const smallTalk = findSmallTalk(text);
       if (smallTalk) {
         addMsg('bot', smallTalk);
         return;
       }
-      // 2. FAQ knowledge base
       const match = findAnswer(text);
       if (match) {
         addMsg('bot', `**${match.q}**\n\n${match.a}`);
@@ -458,12 +438,10 @@ export default function CustomerSupport() {
     { from: 'bot', text: 'Hi! I\'m QuickTopUp support. How can I help you today?', id: msgId.current++ },
   ]);
 
-  // ── Rendering ─────────────────────────────
   const widgetStyle = pos.x !== null
     ? { position: 'fixed', left: pos.x, top: pos.y, bottom: 'auto', right: 'auto', cursor: dragging ? 'grabbing' : 'auto' }
     : {};
 
-  // FAB (chat bubble) — always visible
   if (!open) {
     return (
       <button className="cs-fab" onClick={() => setOpen(true)} aria-label="Open support chat">
@@ -475,7 +453,6 @@ export default function CustomerSupport() {
 
   return (
     <div className="cs-widget" ref={widgetRef} style={widgetStyle}>
-      {/* Header — drag handle */}
       <div
         className="cs-header"
         onMouseDown={onMouseDown}
@@ -487,8 +464,8 @@ export default function CustomerSupport() {
         }}
         style={{ cursor: dragging ? 'grabbing' : 'grab' }}
       >
-          <div className="cs-header-info">
-            <div className="cs-avatar"><HelpCircle size={20} /></div>
+        <div className="cs-header-info">
+          <div className="cs-avatar"><HelpCircle size={20} /></div>
           <div>
             <div className="cs-title">QuickTopUp Support</div>
             <div className="cs-status">● Online · Instant replies</div>
@@ -507,14 +484,12 @@ export default function CustomerSupport() {
 
       {!minimised && (
         <>
-          {/* Messages */}
           <div className="cs-messages">
             {messages.map(msg => (
               <div key={msg.id} className={`cs-msg cs-msg-${msg.from}`}>
                 {msg.from === 'bot' && <div className="cs-bot-avatar"><HelpCircle size={16} /></div>}
                 <div className={`cs-bubble cs-bubble-${msg.from}`}>
                   {msg.text.split('\n').map((line, i) => {
-                    // Bold **text**
                     const parts = line.split(/\*\*(.*?)\*\*/g);
                     return (
                       <p key={i} style={{ margin: i === 0 ? 0 : '4px 0 0' }}>
@@ -528,7 +503,6 @@ export default function CustomerSupport() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Quick topics — shown when only the greeting exists */}
           {messages.length <= 1 && (
             <div className="cs-quick-topics">
               <div className="cs-quick-label">Quick topics:</div>
@@ -542,7 +516,6 @@ export default function CustomerSupport() {
             </div>
           )}
 
-          {/* Input */}
           <div className="cs-input-row">
             <input
               className="cs-input"
