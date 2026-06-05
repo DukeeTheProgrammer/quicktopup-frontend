@@ -2,6 +2,7 @@ import client from './client';
 
 export const register = (data) => client.post('/auth/register/', data);
 export const login = (data) => client.post('/auth/login/', data);
+export const googleAuth = (data) => client.post('/auth/google/', data);
 export const logout = () => client.post('/auth/logout/');
 export const getProfile = () => client.get('/auth/profile/');
 export const updateProfile = (data) => client.patch('/auth/profile/', data);
