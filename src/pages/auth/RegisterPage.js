@@ -25,16 +25,10 @@ export default function RegisterPage() {
       return;
     }
 
-    if (!form.phone) {
-      toast.error('Please enter your phone number before using Google sign up.');
-      return;
-    }
-
     setGoogleLoading(true);
     try {
       const res = await googleAuth({
         id_token: credential,
-        phone: form.phone,
         first_name: form.first_name,
         last_name: form.last_name,
       });
@@ -148,9 +142,9 @@ export default function RegisterPage() {
             value={form.email} onChange={set('email')} required />
         </div>
         <div className="form-group">
-          <label className="form-label">Phone Number</label>
+          <label className="form-label">Phone Number <span style={{ color: 'var(--gray)', fontWeight: 400, fontSize: 12 }}>(optional)</span></label>
           <input className="form-input" type="tel" placeholder="+2348012345678 or +233241234567"
-            value={form.phone} onChange={set('phone')} required />
+            value={form.phone} onChange={set('phone')} />
         </div>
         <div className="form-group">
           <label className="form-label">Password</label>
