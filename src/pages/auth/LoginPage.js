@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import AuthLayout from './AuthLayout';
-import { login } from '../../api/auth';
+import { login, googleAuth } from '../../api/auth';
 import { useAuth } from '../../context/AuthContext';
+import GoogleSignInButton from '../../components/GoogleSignInButton';
 import toast from 'react-hot-toast';
 import { Eye, EyeOff, Hand } from 'lucide-react';
 
@@ -11,6 +12,50 @@ export default function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  const handleGoogleResponse = async (credential) => {
+    if (!credential) {
+      toast.error('Google sign in failed. Please try again.');
+      return;
+    }
+
+    setGoogleLoading(true);
+    try {
+      const res = await googleAuth({ id_token: credential });
+      const payload = res.data?.data || res.data;
+      const user = payload?.user;
+      const token = payload?.token;
+
+      if (!token) {
+        toast.success(res.data?.message || 'Google authentication successful.');
+        window.location.href = '/dashboard';
+        return;
+      }
+
+      localStorage.setItem('auth_token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      loginUser(user, token);
+      toast.success(`Welcome back, ${user?.first_name || 'there'}!`, { duration: 5000 });
+      window.location.href = '/dashboard';
+    } catch (err) {
+      if (err.response) {
+        const d = err.response.data;
+        const msg = d?.error?.message
+          || d?.message
+          || (typeof d === 'string' ? d : null)
+          || `Error ${err.response.status}`;
+        toast.error(msg);
+      } else if (err.request) {
+        toast.error('No response from server. Check your connection.');
+      } else {
+        console.error('Google auth error:', err);
+        toast.error('Something went wrong. Please try again.');
+      }
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,6 +100,15 @@ export default function LoginPage() {
 
   return (
     <AuthLayout title={<span>Welcome back <Hand size={20} style={{ display: 'inline', verticalAlign: 'middle' }} /></span>} subtitle="Sign in to your QuickTopUp account">
+      <div style={{ marginBottom: 24 }}>
+        <GoogleSignInButton onSuccess={handleGoogleResponse} onError={(message) => toast.error(message)} />
+        {googleLoading && <div style={{ marginTop: 12, color: 'var(--gray)' }}>Signing in with Google...</div>}
+        <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}>
+          <div style={{ flex: 1, height: 1, background: '#e1e1e1' }} />
+          <div style={{ margin: '0 12px', color: '#999', fontSize: 13 }}>or</div>
+          <div style={{ flex: 1, height: 1, background: '#e1e1e1' }} />
+        </div>
+      </div>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label className="form-label">Email Address</label>
