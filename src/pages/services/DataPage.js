@@ -188,7 +188,8 @@ export default function DataPage() {
       await purchaseData({
         phone: form.phone.trim(),
         network: form.network.toLowerCase(),
-        plan_code: selectedPlan?.plan_code || form.plan_id,
+        plan_id: selectedPlan?.id || form.plan_id,
+        plan_code: selectedPlan?.plan_code,
         amount: parseFloat(selectedPlan?.amount || selectedPlan?.selling_price || 0),
         pin,
       });
