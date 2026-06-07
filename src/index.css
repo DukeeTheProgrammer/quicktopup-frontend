@@ -302,3 +302,21 @@ html {
 .page-enter {
   animation: slideInUp 0.45s cubic-bezier(.22,1,.36,1) both;
 }
+
+/* ── Page titles ─────────────────────────────────────────── */
+.page-title {
+  font-size: 24px; font-weight: 800; color: var(--text);
+  margin-bottom: 4px;
+}
+.page-subtitle {
+  font-size: 14px; color: var(--text-muted);
+  margin-bottom: 24px;
+}
+
+/* ── Grid helpers ─────────────────────────────────────────── */
+.grid-2 {
+  display: grid; grid-template-columns: 1fr 1fr;
+}
+@media (max-width: 480px) {
+  .grid-2 { grid-template-columns: 1fr; }
+}

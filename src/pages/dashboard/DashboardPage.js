@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { getWallet } from '../../api/wallet';
 import { getTransactions } from '../../api/transactions';
 import { useAuth } from '../../context/AuthContext';
 import { getWalletCurrency } from '../../utils/currency';
-import { Phone, Wifi, Tv, Zap, Plus, ArrowUpRight, ArrowDownLeft, RefreshCw, Eye, EyeOff, Hand } from 'lucide-react';
+import { Phone, Wifi, Tv, Zap, Plus, ArrowUpRight, ArrowDownLeft, RefreshCw, Eye, EyeOff, Hand, Key, HelpCircle } from 'lucide-react';
 import './Dashboard.css';
 
 const services = [
@@ -26,11 +26,13 @@ const serviceLabel = (s) => {
 
 export default function DashboardPage() {
   const { user, refreshUser } = useAuth();
+  const navigate = useNavigate();
   const [wallet, setWallet] = useState(null);
   const [txns, setTxns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showBal, setShowBal] = useState(true);
   const cur = getWalletCurrency(wallet, user);
+  const hasPin = user?.has_transaction_pin;
 
   useEffect(() => {
     const load = async () => {
@@ -48,6 +50,46 @@ export default function DashboardPage() {
     <div className="dashboard">
       <div className="dash-greeting">
         Good {getGreeting()}, <span>{user?.first_name}!</span> <Hand size={18} style={{ display: 'inline', verticalAlign: 'middle' }} />
+      </div>
+
+      {/* PIN not set prompt */}
+      {!hasPin && (
+        <div style={{
+          background: 'linear-gradient(135deg, #fef3cd 0%, #fff8ec 100%)',
+          borderRadius: 14, padding: '14px 18px', marginBottom: 20,
+          display: 'flex', alignItems: 'center', gap: 12,
+          border: '1px solid #f6ad55',
+        }}>
+          <Key size={20} color="#b7791f" style={{ flexShrink: 0 }} />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 700, fontSize: 14, color: '#92400e' }}>Set Up Transaction PIN</div>
+            <div style={{ fontSize: 12, color: '#a16207', marginTop: 1 }}>
+              You need a 4-digit PIN before you can make purchases
+            </div>
+          </div>
+          <Link to="/profile" style={{
+            background: '#b7791f', color: 'white', padding: '8px 14px', borderRadius: 8,
+            fontWeight: 600, fontSize: 12, textDecoration: 'none', whiteSpace: 'nowrap',
+          }}>
+            Set PIN
+          </Link>
+        </div>
+      )}
+
+      {/* Take tour prompt */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 4, marginTop: -8,
+      }}>
+        <button
+          onClick={() => navigate('/welcome')}
+          style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: 6,
+            fontSize: 12, color: 'var(--gray-500)', fontWeight: 500,
+          }}
+        >
+          <HelpCircle size={14} /> Take a quick tour
+        </button>
       </div>
 
       {/* Wallet card */}
