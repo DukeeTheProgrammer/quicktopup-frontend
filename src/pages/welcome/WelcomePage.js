@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
 import {
-  Phone, Wifi, Tv, Zap, Wallet, ClipboardList,
+  Phone, Wifi, Tv, Wallet, ClipboardList,
   User, Bell, Shield, ChevronRight, Check, ArrowRight,
   LayoutDashboard
 } from 'lucide-react';
@@ -77,7 +76,6 @@ const steps = [
 export default function WelcomePage() {
   const [step, setStep] = useState(0);
   const navigate = useNavigate();
-  const { user } = useAuth();
   const current = steps[step];
   const Icon = current.icon;
 
