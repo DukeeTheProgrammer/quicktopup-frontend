@@ -108,6 +108,40 @@
 .txn-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
 .txn-amount { font-size: 14px; font-weight: 700; color: var(--text); }
 
+/* ── KYC Dashboard Card ── */
+.kyc-dash-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  transition: all 0.25s cubic-bezier(.34,1.56,.64,1);
+}
+
+.kyc-dash-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+  border-color: var(--green);
+}
+
+.kyc-dash-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.kyc-dash-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 /* ── Dashboard responsive ── */
 @media (max-width: 768px) {
   .wallet-hero { padding: 22px 18px; border-radius: 16px; }
