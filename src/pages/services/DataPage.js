@@ -67,9 +67,7 @@ function getErrorMsg(err) {
     WALLET_LOCKED: 'Your wallet is locked. Contact support.',
     PIN_REQUIRED: 'Set a transaction PIN first — go to Profile → Security.',
     DUPLICATE_REQUEST: 'Duplicate transaction detected. Please wait before retrying.',
-    TRANSACTION_FAILED: 'Transaction rejected by the network provider. Please try again.',
     PAYMENT_INIT_FAILED: 'Payment initiation failed. Try a different method.',
-    FETCH_FAILED: 'Could not load service data. Please retry.',
   };
   return MAP[code] || msg || 'Something went wrong. Please try again.';
 }
