@@ -13,6 +13,4 @@ export const pinResetRequest = () => client.post('/auth/pin-reset-request/');
 export const pinResetConfirm = (data) => client.post('/auth/pin-reset-confirm/', data);
 export const phoneChangeRequest = (data) => client.post('/auth/phone-change-request/', data);
 export const phoneChangeConfirm = (data) => client.post('/auth/phone-change-confirm/', data);
-export const uploadAvatar = (data) => client.put('/auth/profile/', data, {
-  headers: { 'Content-Type': 'multipart/form-data' }
-});
+export const uploadAvatar = (data) => client.put('/auth/profile/', data);

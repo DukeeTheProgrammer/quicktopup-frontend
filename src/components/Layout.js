@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 import { getUserCurrency } from '../utils/currency';
 import {
   LayoutDashboard, Phone, Wifi, Tv, Zap, Wallet, ClipboardList,
-  Bell, User, LogOut, Menu, X, ChevronRight, Sun, Moon
+  Bell, User, Shield, LogOut, Menu, X, ChevronRight, Sun, Moon
 } from 'lucide-react';
 import './Layout.css';
 
@@ -20,6 +20,7 @@ const navItems = [
   { to: '/electricity', icon: Zap, label: 'Electricity' },
   { to: '/wallet', icon: Wallet, label: 'Wallet' },
   { to: '/transactions', icon: ClipboardList, label: 'Transactions' },
+  { to: '/kyc', icon: Shield, label: 'KYC Verification' },
   { to: '/notifications', icon: Bell, label: 'Notifications' },
   { to: '/profile', icon: User, label: 'Profile' },
 ];

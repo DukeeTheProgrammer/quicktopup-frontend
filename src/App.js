@@ -18,6 +18,7 @@ import WalletPage from './pages/wallet/WalletPage';
 import TransactionsPage from './pages/transactions/TransactionsPage';
 import NotificationsPage from './pages/notifications/NotificationsPage';
 import ProfilePage from './pages/profile/ProfilePage';
+import KYCVerificationPage from './pages/kyc/KYCVerificationPage';
 import WelcomePage from './pages/welcome/WelcomePage';
 import Layout from './components/Layout';
 import CustomerSupport from './components/CustomerSupport';
@@ -54,6 +55,7 @@ function AppRoutes() {
       <Route path="/transactions" element={<PrivateRoute><Layout><TransactionsPage /></Layout></PrivateRoute>} />
       <Route path="/notifications" element={<PrivateRoute><Layout><NotificationsPage /></Layout></PrivateRoute>} />
       <Route path="/profile"      element={<PrivateRoute><Layout><ProfilePage /></Layout></PrivateRoute>} />
+      <Route path="/kyc"         element={<PrivateRoute><Layout><KYCVerificationPage /></Layout></PrivateRoute>} />
       <Route path="/welcome"     element={<PrivateRoute><WelcomePage /></PrivateRoute>} />
 
       {/* Fallback */}

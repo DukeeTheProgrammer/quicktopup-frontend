@@ -4,7 +4,7 @@ import { getWallet } from '../../api/wallet';
 import { getTransactions } from '../../api/transactions';
 import { useAuth } from '../../context/AuthContext';
 import { getWalletCurrency } from '../../utils/currency';
-import { Phone, Wifi, Tv, Zap, Plus, ArrowUpRight, ArrowDownLeft, RefreshCw, Eye, EyeOff, Hand, Key, HelpCircle } from 'lucide-react';
+import { Phone, Wifi, Tv, Zap, Plus, ArrowUpRight, ArrowDownLeft, RefreshCw, Eye, EyeOff, Hand, Key, HelpCircle, Shield, BadgeCheck, ChevronRight } from 'lucide-react';
 import './Dashboard.css';
 
 const services = [
@@ -118,6 +118,33 @@ export default function DashboardPage() {
         <Link to="/wallet" className="fund-btn">
           <Plus size={16} /> Fund Wallet
         </Link>
+      </div>
+
+      {/* KYC status card */}
+      <div className="kyc-dash-card" onClick={() => navigate('/kyc')}
+        style={{ cursor: 'pointer', marginBottom: 24 }}>
+        <div className="kyc-dash-left">
+          <div className="kyc-dash-icon" style={{
+            background: user?.kyc_level >= 2 ? '#e6f9f0' : user?.kyc_level >= 1 ? '#fffbeb' : 'var(--gray-100)',
+          }}>
+            {user?.kyc_level >= 2 ? <BadgeCheck size={22} color="#00b96b" /> :
+             user?.kyc_level >= 1 ? <Shield size={22} color="#b7791f" /> :
+             <Shield size={22} color="var(--gray-400)" />}
+          </div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)' }}>
+              {user?.kyc_level >= 2 ? 'Identity Verified' :
+               user?.kyc_level >= 1 ? 'KYC Pending Review' :
+               'Verify Your Identity'}
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--gray-500)', marginTop: 1 }}>
+              {user?.kyc_level >= 2 ? 'Level 2 — All features unlocked' :
+               user?.kyc_level >= 1 ? 'Level 1 — Submitted for review' :
+               'Complete KYC to unlock higher limits'}
+            </div>
+          </div>
+        </div>
+        <ChevronRight size={18} color="var(--gray-400)" />
       </div>
 
       {/* Quick services */}

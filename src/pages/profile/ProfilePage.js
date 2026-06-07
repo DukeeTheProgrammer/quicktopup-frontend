@@ -1,11 +1,13 @@
 import React, { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { updateProfile, setPin, pinResetRequest, pinResetConfirm, phoneChangeRequest, phoneChangeConfirm, uploadAvatar } from '../../api/auth';
 import toast from 'react-hot-toast';
-import { User, Shield, Phone, Mail, CheckCircle, Clock, Key, Lock, Camera, RefreshCw, Send } from 'lucide-react';
+import { User, Shield, Phone, Mail, CheckCircle, Clock, Key, Lock, Camera, RefreshCw, Send, BadgeCheck, ChevronRight } from 'lucide-react';
 
 export default function ProfilePage() {
   const { user, refreshUser } = useAuth();
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     first_name: user?.first_name || '',
     last_name: user?.last_name || '',
@@ -171,41 +173,51 @@ export default function ProfilePage() {
       <div className="page-title">Profile & Settings</div>
       <div className="page-subtitle">Manage your account information</div>
 
-      {/* Profile summary card with avatar */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 20, background: 'var(--bg-card)', borderRadius: 16, padding: 20, marginBottom: 20, boxShadow: 'var(--shadow-sm)' }}>
-        <div style={{ position: 'relative', flexShrink: 0 }}>
-          <div style={{
-            width: 72, height: 72, borderRadius: '50%', overflow: 'hidden',
-            background: 'var(--gray-200)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            border: '3px solid var(--green)',
-          }}>
-            {user?.avatar ? (
-              <img src={user.avatar} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-              <span style={{ fontSize: 28, fontWeight: 800, color: 'var(--green)' }}>
-                {user?.first_name?.[0]}{user?.last_name?.[0]}
-              </span>
-            )}
+      {/* Profile card with cover */}
+      <div style={{ background: 'var(--bg-card)', borderRadius: 16, marginBottom: 20, boxShadow: 'var(--shadow-sm)', overflow: 'hidden' }}>
+        {/* Cover */}
+        <div style={{
+          height: 80,
+          background: 'linear-gradient(135deg, #0a2a18 0%, #00b96b 50%, #0a2a18 100%)',
+          position: 'relative',
+        }} />
+        <div style={{ padding: '0 20px 20px', marginTop: -36 }}>
+          <div style={{ display: 'flex', gap: 20, alignItems: 'flex-end' }}>
+            <div style={{ position: 'relative', flexShrink: 0 }}>
+              <div style={{
+                width: 72, height: 72, borderRadius: '50%', overflow: 'hidden',
+                background: 'var(--gray-200)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                border: '3px solid var(--bg-card)', boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+              }}>
+                {user?.avatar ? (
+                  <img src={user.avatar} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <span style={{ fontSize: 28, fontWeight: 800, color: 'var(--green)' }}>
+                    {user?.first_name?.[0]}{user?.last_name?.[0]}
+                  </span>
+                )}
+              </div>
+              <button
+                onClick={() => fileRef.current?.click()}
+                disabled={uploading}
+                style={{
+                  position: 'absolute', bottom: 0, right: 0, width: 28, height: 28, borderRadius: '50%',
+                  background: 'var(--green)', color: 'white', border: '2px solid var(--bg-card)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                  fontSize: 13, boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+                }}
+                title="Change profile picture"
+              >
+                {uploading ? <span className="spinner" style={{ width: 14, height: 14 }} /> : <Camera size={14} />}
+              </button>
+              <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarChange} />
+            </div>
+            <div style={{ flex: 1, paddingTop: 28 }}>
+              <div style={{ fontWeight: 700, fontSize: 18 }}>{user?.first_name} {user?.last_name}</div>
+              <div style={{ color: 'var(--gray-500)', fontSize: 13, marginTop: 2 }}>{user?.email}</div>
+            </div>
           </div>
-          <button
-            onClick={() => fileRef.current?.click()}
-            disabled={uploading}
-            style={{
-              position: 'absolute', bottom: 0, right: 0, width: 28, height: 28, borderRadius: '50%',
-              background: 'var(--green)', color: 'white', border: '2px solid var(--bg-card)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-              fontSize: 13,
-            }}
-            title="Change profile picture"
-          >
-            {uploading ? <span className="spinner" style={{ width: 14, height: 14 }} /> : <Camera size={14} />}
-          </button>
-          <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarChange} />
-        </div>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 700, fontSize: 18 }}>{user?.first_name} {user?.last_name}</div>
-          <div style={{ color: 'var(--gray-500)', fontSize: 13, marginTop: 2 }}>{user?.email}</div>
-          <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
             <span className={`badge ${user?.is_verified ? 'badge-success' : 'badge-warning'}`}>
               {user?.is_verified ? <><CheckCircle size={11} /> Verified</> : <><Clock size={11} /> Unverified</>}
             </span>
@@ -222,6 +234,34 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* KYC quick link */}
+      {user?.kyc_level < 2 && (
+        <div
+          onClick={() => navigate('/kyc')}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer',
+            background: user?.kyc_level >= 1
+              ? 'linear-gradient(135deg, #fffbeb 0%, #fef3cd 100%)'
+              : 'linear-gradient(135deg, #e6f9f0 0%, #f0fdf4 100%)',
+            borderRadius: 12, padding: '12px 16px', marginBottom: 20,
+            border: user?.kyc_level >= 1 ? '1px solid #f6ad55' : '1px solid #00b96b',
+          }}
+        >
+          <Shield size={22} color={user?.kyc_level >= 1 ? '#b7791f' : '#00b96b'} />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 700, fontSize: 13, color: user?.kyc_level >= 1 ? '#92400e' : '#065f46' }}>
+              {user?.kyc_level >= 1 ? 'KYC Under Review' : 'Complete Your KYC'}
+            </div>
+            <div style={{ fontSize: 12, color: user?.kyc_level >= 1 ? '#a16207' : '#047857', marginTop: 1 }}>
+              {user?.kyc_level >= 1
+                ? 'Your documents are being reviewed'
+                : 'Verify your identity to unlock higher limits'}
+            </div>
+          </div>
+          <ChevronRight size={18} color={user?.kyc_level >= 1 ? '#b7791f' : '#00b96b'} />
+        </div>
+      )}
 
       {/* Tabs */}
       <div style={{ display: 'flex', gap: 4, background: 'var(--gray-200)', borderRadius: 12, padding: 4, marginBottom: 20 }}>
