@@ -6,7 +6,6 @@ const client = axios.create({
   baseURL: BASE_URL,
   withCredentials: false,
   headers: {
-    'Content-Type': 'application/json',
     'Accept': 'application/json',
     // ngrok shows a browser warning interstitial page for unrecognised browsers.
     // This header bypasses it so we always get JSON back instead of HTML.
@@ -23,6 +22,10 @@ client.interceptors.request.use((config) => {
     config.headers['Authorization'] = `Token ${token}`;
   } else {
     delete config.headers['Authorization'];
+  }
+  // Set JSON content-type for non-FormData requests; let axios auto-detect FormData.
+  if (!(config.data instanceof FormData)) {
+    config.headers['Content-Type'] = 'application/json';
   }
   return config;
 });
