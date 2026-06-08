@@ -4,7 +4,7 @@ import client from '../../api/client';
 import toast from 'react-hot-toast';
 import {
   Shield, CheckCircle, XCircle, Clock, Camera, FileText,
-  Lock, BadgeCheck, IdCard
+  Lock, BadgeCheck, IdCard, Globe
 } from 'lucide-react';
 import './KYCVerificationPage.css';
 
@@ -14,12 +14,29 @@ const LEVELS = [
   { level: 2, label: 'Verified', icon: BadgeCheck, color: '#00b96b' },
 ];
 
+const ID_SCHEMAS = {
+  Nigeria: {
+    fields: [
+      { key: 'nin', label: 'National Identification Number (NIN)', placeholder: 'Enter your 11-digit NIN', maxLength: 11, hint: '11-digit NIN', icon: IdCard },
+      { key: 'bvn', label: 'Bank Verification Number (BVN)', placeholder: 'Enter your 11-digit BVN', maxLength: 11, hint: '11-digit BVN', icon: Lock },
+    ],
+  },
+  Ghana: {
+    fields: [
+      { key: 'ghana_card', label: 'Ghana Card', placeholder: 'Enter your Ghana Card number', maxLength: 15, hint: 'National ID card number', icon: IdCard },
+      { key: 'ssnit', label: 'SSNIT Number', placeholder: 'Enter your SSNIT number', maxLength: 15, hint: 'Social Security number', icon: Lock },
+    ],
+  },
+};
+
 export default function KYCVerificationPage() {
   const { user, refreshUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [kycData, setKycData] = useState(null);
   const [nin, setNin] = useState('');
   const [bvn, setBvn] = useState('');
+  const [ghanaCard, setGhanaCard] = useState('');
+  const [ssnit, setSsnit] = useState('');
   const [documentType, setDocumentType] = useState('id_card');
   const [documentNumber, setDocumentNumber] = useState('');
   const [frontImage, setFrontImage] = useState(null);
@@ -30,6 +47,9 @@ export default function KYCVerificationPage() {
 
   const kycLevel = user?.kyc_level ?? 0;
   const currentLevel = LEVELS[kycLevel] || LEVELS[0];
+  const country = user?.country || 'Nigeria';
+  const schema = ID_SCHEMAS[country] || ID_SCHEMAS.Nigeria;
+  const isGhana = country === 'Ghana';
 
   useEffect(() => {
     loadKYCStatus();
@@ -42,6 +62,8 @@ export default function KYCVerificationPage() {
       setKycData(data);
       if (data?.nin) setNin('');
       if (data?.bvn) setBvn('');
+      if (data?.ghana_card) setGhanaCard('');
+      if (data?.ssnit) setSsnit('');
     } catch {}
   };
 
@@ -57,14 +79,17 @@ export default function KYCVerificationPage() {
   };
 
   const handleSubmit = async () => {
-    if (!nin && !bvn && !frontImage) {
-      toast.error('Provide at least NIN, BVN, or a document image');
+    const hasIdentity = isGhana ? (ghanaCard || ssnit) : (nin || bvn);
+    if (!hasIdentity && !frontImage) {
+      toast.error(`Provide at least ${isGhana ? 'Ghana Card, SSNIT' : 'NIN, BVN'}, or a document image`);
       return;
     }
 
     const fd = new FormData();
     if (nin) fd.append('nin', nin.replace(/\s/g, ''));
     if (bvn) fd.append('bvn', bvn.replace(/\s/g, ''));
+    if (ghanaCard) fd.append('ghana_card', ghanaCard.replace(/\s/g, ''));
+    if (ssnit) fd.append('ssnit', ssnit.replace(/\s/g, ''));
     if (documentType) fd.append('document_type', documentType);
     if (documentNumber) fd.append('document_number', documentNumber);
     if (frontImage) fd.append('front_image', frontImage);
@@ -78,6 +103,8 @@ export default function KYCVerificationPage() {
       await loadKYCStatus();
       setNin('');
       setBvn('');
+      setGhanaCard('');
+      setSsnit('');
       setFrontImage(null);
       setBackImage(null);
       setPreview(null);
@@ -96,6 +123,18 @@ export default function KYCVerificationPage() {
     <div className="kyc-page">
       <div className="page-title">Identity Verification</div>
       <div className="page-subtitle">Complete your KYC to unlock all features</div>
+
+      {/* Country badge */}
+      <div style={{
+        display: 'inline-flex', alignItems: 'center', gap: 6,
+        background: isGhana ? '#fef3cd' : '#e6f9f0',
+        color: isGhana ? '#92400e' : '#065f46',
+        padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: 600,
+        marginBottom: 20,
+      }}>
+        <Globe size={14} />
+        {country === 'Ghana' ? ' Ghana' : ' Nigeria'}
+      </div>
 
       {/* KYC Level Progress */}
       <div className="kyc-progress-card">
@@ -128,51 +167,43 @@ export default function KYCVerificationPage() {
       </div>
 
       <div className="kyc-grid">
-        {/* NIN Section */}
-        <div className={`kyc-section ${kycData?.has_nin ? 'done' : ''}`}>
-          <div className="kyc-section-header">
-            <div className="kyc-section-icon"><IdCard size={20} /></div>
-            <div>
-              <h3>National Identification Number (NIN)</h3>
-              <p>11-digit NIN</p>
-            </div>
-            {kycData?.has_nin && <CheckCircle size={20} color="#00b96b" />}
-          </div>
-          {kycData?.has_nin ? (
-            <div className="kyc-verified-badge">
-              <CheckCircle size={16} /> NIN Verified (••••{kycData.nin})
-            </div>
-          ) : (
-            <div className="kyc-section-body">
-              <input className="form-input" value={nin}
-                onChange={e => setNin(e.target.value.replace(/\D/g, '').slice(0, 11))}
-                placeholder="Enter your 11-digit NIN" maxLength={11} inputMode="numeric" />
-            </div>
-          )}
-        </div>
+        {/* Country-specific identity fields */}
+        {schema.fields.map(({ key, label, placeholder, maxLength, hint, icon: Icon }) => {
+          const hasValue = kycData?.[`has_${key}`];
+          const maskedValue = kycData?.[key];
+          const setter = key === 'nin' ? setNin
+            : key === 'bvn' ? setBvn
+            : key === 'ghana_card' ? setGhanaCard
+            : setSsnit;
+          const value = key === 'nin' ? nin
+            : key === 'bvn' ? bvn
+            : key === 'ghana_card' ? ghanaCard
+            : ssnit;
 
-        {/* BVN Section */}
-        <div className={`kyc-section ${kycData?.has_bvn ? 'done' : ''}`}>
-          <div className="kyc-section-header">
-            <div className="kyc-section-icon"><Lock size={20} /></div>
-            <div>
-              <h3>Bank Verification Number (BVN)</h3>
-              <p>11-digit BVN</p>
+          return (
+            <div key={key} className={`kyc-section ${hasValue ? 'done' : ''}`}>
+              <div className="kyc-section-header">
+                <div className="kyc-section-icon"><Icon size={20} /></div>
+                <div>
+                  <h3>{label}</h3>
+                  <p>{hint}</p>
+                </div>
+                {hasValue && <CheckCircle size={20} color="#00b96b" />}
+              </div>
+              {hasValue ? (
+                <div className="kyc-verified-badge">
+                  <CheckCircle size={16} /> Verified (••••{maskedValue})
+                </div>
+              ) : (
+                <div className="kyc-section-body">
+                  <input className="form-input" value={value}
+                    onChange={e => setter(e.target.value.replace(/\D/g, '').slice(0, maxLength))}
+                    placeholder={placeholder} maxLength={maxLength} inputMode="numeric" />
+                </div>
+              )}
             </div>
-            {kycData?.has_bvn && <CheckCircle size={20} color="#00b96b" />}
-          </div>
-          {kycData?.has_bvn ? (
-            <div className="kyc-verified-badge">
-              <CheckCircle size={16} /> BVN Verified (••••{kycData.bvn})
-            </div>
-          ) : (
-            <div className="kyc-section-body">
-              <input className="form-input" value={bvn}
-                onChange={e => setBvn(e.target.value.replace(/\D/g, '').slice(0, 11))}
-                placeholder="Enter your 11-digit BVN" maxLength={11} inputMode="numeric" />
-            </div>
-          )}
-        </div>
+          );
+        })}
 
         {/* Document Upload Section */}
         <div className={`kyc-section ${kycData?.documents?.length ? 'done' : ''}`}>
