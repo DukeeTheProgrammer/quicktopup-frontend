@@ -4,8 +4,8 @@ import { useAuth } from '../../context/AuthContext';
 import client from '../../api/client';
 import toast from 'react-hot-toast';
 import {
-  Shield, CheckCircle, XCircle, Clock, Upload, Camera, FileText,
-  User, ArrowRight, Lock, BadgeCheck, IdCard, Eye
+  Shield, CheckCircle, XCircle, Clock, Camera, FileText,
+  Lock, BadgeCheck, IdCard
 } from 'lucide-react';
 import './KYCVerificationPage.css';
 
