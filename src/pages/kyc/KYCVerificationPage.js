@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import client from '../../api/client';
 import toast from 'react-hot-toast';
@@ -17,7 +16,6 @@ const LEVELS = [
 
 export default function KYCVerificationPage() {
   const { user, refreshUser } = useAuth();
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [kycData, setKycData] = useState(null);
   const [nin, setNin] = useState('');
@@ -31,7 +29,6 @@ export default function KYCVerificationPage() {
   const backFileRef = useRef(null);
 
   const kycLevel = user?.kyc_level ?? 0;
-  const kycStatus = user?.kyc_status || 'unverified';
   const currentLevel = LEVELS[kycLevel] || LEVELS[0];
 
   useEffect(() => {
@@ -75,7 +72,7 @@ export default function KYCVerificationPage() {
 
     setLoading(true);
     try {
-      const res = await client.post('/auth/kyc/submit/', fd);
+      await client.post('/auth/kyc/submit/', fd);
       toast.success('KYC information submitted!', { duration: 6000 });
       await refreshUser();
       await loadKYCStatus();
