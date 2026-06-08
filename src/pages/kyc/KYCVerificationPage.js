@@ -111,7 +111,12 @@ export default function KYCVerificationPage() {
       setDocumentNumber('');
     } catch (err) {
       const d = err.response?.data;
-      toast.error(d?.error?.message || d?.message || d?.detail || 'Submission failed');
+      const msg = typeof d === 'string' ? d
+        : d?.error?.message || d?.message || d?.detail
+        || (d ? Object.entries(d).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`).join('; ') : null)
+        || err.message
+        || 'Submission failed';
+      toast.error(msg, { duration: 8000 });
     } finally {
       setLoading(false);
     }
