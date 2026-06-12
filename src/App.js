@@ -10,6 +10,7 @@ import RegisterPage from './pages/auth/RegisterPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import DashboardPage from './pages/dashboard/DashboardPage';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AirtimePage from './pages/services/AirtimePage';
 import DataPage from './pages/services/DataPage';
 import CablePage from './pages/services/CablePage';
@@ -26,6 +27,13 @@ import CustomerSupport from './components/CustomerSupport';
 const PrivateRoute = ({ children }) => {
   const { token } = useAuth();
   return token ? children : <Navigate to="/login" replace />;
+};
+
+const AdminRoute = ({ children }) => {
+  const { token, user } = useAuth();
+  if (!token) return <Navigate to="/login" replace />;
+  if (!user?.is_staff) return <Navigate to="/dashboard" replace />;
+  return children;
 };
 
 const PublicRoute = ({ children }) => {
@@ -57,6 +65,9 @@ function AppRoutes() {
       <Route path="/profile"      element={<PrivateRoute><Layout><ProfilePage /></Layout></PrivateRoute>} />
       <Route path="/kyc"         element={<PrivateRoute><Layout><KYCVerificationPage /></Layout></PrivateRoute>} />
       <Route path="/welcome"     element={<PrivateRoute><WelcomePage /></PrivateRoute>} />
+
+      {/* Admin */}
+      <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboardPage /></AdminRoute>} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
