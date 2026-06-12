@@ -2,8 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { getAdminDashboard } from '../../api/admin';
 import {
   Users, Activity, DollarSign, TrendingUp, TrendingDown,
-  CheckCircle, XCircle, Clock, Database, Zap, Shield,
-  Cpu, HardDrive, RefreshCw, AlertTriangle
+  CheckCircle, XCircle, Database, RefreshCw, AlertTriangle
 } from 'lucide-react';
 
 const REFRESH_INTERVAL = 30000;
@@ -71,7 +70,7 @@ export default function AdminDashboardPage() {
     );
   }
 
-  const { summary = {}, wallet = {}, providers = [], provider_by_service = [], system_health = {}, charts = {}, historical_summaries = [], health_history = [] } = data || {};
+  const { summary = {}, wallet = {}, providers = [], system_health = {}, charts = {}, historical_summaries = [], health_history = [] } = data || {};
   const { daily_trend = [], service_breakdown = [] } = charts;
 
   return (
@@ -133,7 +132,6 @@ export default function AdminDashboardPage() {
           <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', height: 160 }}>
             {daily_trend.map((d) => {
               const max = Math.max(...daily_trend.map(x => x.total), 1);
-              const h = (d.total / max) * 140;
               const s = d.successful;
               const f = d.failed;
               return (
