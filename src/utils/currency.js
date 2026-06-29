@@ -5,11 +5,11 @@ const CURRENCY_MAP = {
 };
 
 // Exchange rates relative to NGN (base currency)
-// These are approximate and should be updated periodically
+// These are fallback defaults; the backend should be queried for live rates
 const EXCHANGE_RATES = {
   NGN: 1,
-  GHS: 11.5,  // 1 GHS ≈ 11.5 NGN
-  USD: 1550,  // 1 USD ≈ 1550 NGN
+  GHS: 14.2,  // 1 GHS ≈ 14.2 NGN (approximate, updated Jun 2026)
+  USD: 1550,  // 1 USD ≈ 1550 NGN (approximate, updated Jun 2026)
 };
 
 export function getCurrency(currencyCode) {

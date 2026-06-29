@@ -1,3 +1,8 @@
-# https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Disallow: /auth/
+Disallow: /wallet/
+Disallow: /transactions/
+Disallow: /kyc/
+Disallow: /profile/
+Disallow: /admin/
+Disallow: /reset-password

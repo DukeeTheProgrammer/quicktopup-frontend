@@ -2,15 +2,15 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://unmade-backboned-agreeably.ngrok-free.dev/api/:path*"
+      "destination": "https://quicktopup.it.com/api/:path*"
     },
     {
       "source": "/admin",
-      "destination": "https://unmade-backboned-agreeably.ngrok-free.dev/admin/"
+      "destination": "https://quicktopup.it.com/admin/"
     },
     {
       "source": "/admin/:path*",
-      "destination": "https://unmade-backboned-agreeably.ngrok-free.dev/admin/:path*"
+      "destination": "https://quicktopup.it.com/admin/:path*"
     },
     {
       "source": "/:path*",

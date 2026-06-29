@@ -1,59 +1,58 @@
-# QuickTopUp.ng Frontend
+# QuickTopUp Frontend
 
-> ⚡ A fast, modern VTU (Virtual Top-Up) web app for Nigerian and Ghanaian mobile services — built with React.
+> A fast, modern VTU (Virtual Top-Up) web app for Nigerian and Ghanaian mobile services — built with React 19.
 
-![React](https://img.shields.io/badge/React-18-61dafb?logo=react) ![License](https://img.shields.io/badge/license-MIT-green) ![Status](https://img.shields.io/badge/status-production--ready-brightgreen)
+![React](https://img.shields.io/badge/React-19-61dafb?logo=react) ![License](https://img.shields.io/badge/license-MIT-green)
 
----
+## Features
 
-## 📱 Features
+- **Authentication** — Register, Login, Forgot/Reset Password, Google OAuth, Set Transaction PIN
+- **Wallet** — Fund wallet via Flutterwave, view balance, transaction ledger
+- **Airtime** — Nigeria & Ghana: MTN, Airtel, Glo, 9Mobile, Vodafone, AirtelTigo
+- **Data Bundles** — Browse and buy plans by network, filtered live from the API
+- **Cable TV** — DSTV, GOtv, Startimes — wallet-deducted instantly
+- **Electricity** — All Nigerian DISCOs, prepaid & postpaid
+- **Transaction History** — Paginated, filterable by status / service / date range
+- **Notifications** — In-app alerts with mark-as-read
+- **Profile & Security** — Update personal info, set 4-digit transaction PIN, KYC verification
+- **PIN Modal** — 4-digit PIN confirmation for all wallet purchases
+- **Admin Dashboard** — KPI cards, system health, provider metrics, daily trends
+- **Onboarding Tour** — Welcome wizard for first-time users
+- **Customer Support Chatbot** — In-app FAQ bot with pattern matching
+- **Dark/Light Theme** — System-aware theme toggle with persistence
 
-- 🔐 **Authentication** — Register, Login, Forgot/Reset Password, Set Transaction PIN
-- 💰 **Wallet** — Fund wallet via Flutterwave, view balance, transaction ledger
-- 📱 **Airtime** — Nigeria & Ghana: MTN, Airtel, Glo, 9Mobile, Vodafone, AirtelTigo
-- 📶 **Data Bundles** — Browse and buy plans by network, filtered live from the API
-- 📺 **Cable TV** — DSTV, GOtv, Startimes, Showmax — wallet-deducted instantly
-- ⚡ **Electricity** — All Nigerian DISCOs, prepaid & postpaid, wallet-deducted
-- 📋 **Transaction History** — Paginated, filterable by status / service / date range
-- 🔔 **Notifications** — In-app alerts with mark-as-read
-- 👤 **Profile & Security** — Update personal info, set 4-digit transaction PIN
-- 🔒 **PIN Modal** — 4-digit PIN confirmation for all wallet purchases
-
----
-
-## 🛠 Tech Stack
+## Tech Stack
 
 | Layer | Tech |
 |-------|------|
-| Framework | React 18 |
-| Routing | React Router v6 |
-| HTTP Client | Axios |
-| Icons | Lucide React |
-| Toasts | React Hot Toast |
+| Framework | React ^19.2.6 |
+| Routing | React Router ^7.15.1 |
+| HTTP Client | Axios ^1.16.1 |
+| Icons | Lucide React ^1.16.0 |
+| Toasts | React Hot Toast ^2.6.0 |
 | Styling | Custom CSS (no UI library) |
 
----
-
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
-- Node.js 16+
+- Node.js 18+
 - npm or yarn
 
 ### Installation
 
 ```bash
-git clone https://github.com/DukeeTheProgrammer/quicktopup-frontend.git
+git clone https://github.com/yourusername/quicktopup-frontend.git
 cd quicktopup-frontend
 npm install
 ```
 
 ### Environment Setup
 
-Update `src/api/client.js` with your backend URL:
+Copy `.env.example` to `.env` and fill in your values:
 
-```js
-const BASE_URL = 'https://your-backend-url.com/api';
+```env
+REACT_APP_API_BASE_URL=/api
+REACT_APP_GOOGLE_OAUTH_CLIENT_ID=your-client-id
 ```
 
 ### Run Locally
@@ -70,149 +69,60 @@ App runs at `http://localhost:3000`
 npm run build
 ```
 
----
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 src/
 ├── api/
-│   ├── client.js          # Axios instance + auth interceptor
-│   ├── auth.js            # register, login, logout, profile, set-pin
-│   ├── wallet.js          # getWallet, fundWallet, getWalletLedger
-│   ├── transactions.js    # purchaseAirtime, purchaseData, purchaseCable,
-│   │                      #   purchaseElectricity, getTransactions
-│   ├── services.js        # getNetworks, getDataPlans, getCablePlans,
-│   │                      #   getElectricityBillers
-│   └── notifications.js   # getNotifications, markNotificationRead
+│   ├── client.js              # Axios instance + auth interceptor
+│   ├── auth.js                # register, login, logout, profile, set-pin
+│   ├── wallet.js              # getWallet, fundWallet, getWalletLedger
+│   ├── transactions.js        # purchaseAirtime, purchaseData, etc.
+│   ├── services.js            # getNetworks, getDataPlans, getCablePlans
+│   ├── notifications.js       # getNotifications, markNotificationRead
+│   └── admin.js               # getAdminDashboard
 ├── components/
-│   └── Layout.js          # Sidebar + topbar shell
+│   ├── Layout.js              # Sidebar + topbar shell
+│   ├── CustomerSupport.js     # FAQ chatbot widget
+│   └── GoogleSignInButton.js  # Google OAuth button
 ├── context/
-│   └── AuthContext.js     # Token + user session management
+│   ├── AuthContext.js         # Token + user session management
+│   └── ThemeContext.js        # Dark/light theme toggle
 └── pages/
-    ├── auth/              # Login, Register, ForgotPassword, ResetPassword
-    ├── dashboard/         # Wallet hero + quick services + recent txns
-    ├── services/          # Airtime, Data, CableTV, Electricity + PinModal
-    ├── wallet/            # Wallet balance, Fund modal, Ledger tab
-    ├── transactions/      # Paginated history with filters
-    ├── notifications/     # Notification centre
-    └── profile/           # Profile info + Set Transaction PIN
+    ├── auth/                  # Login, Register, ForgotPassword, ResetPassword
+    ├── landing/               # Marketing landing page
+    ├── dashboard/             # Wallet hero + quick services + recent txns
+    ├── services/              # Airtime, Data, CableTV, Electricity + PinModal
+    ├── wallet/                # Wallet balance, Fund modal, Ledger tab
+    ├── transactions/          # Paginated history with filters
+    ├── notifications/         # Notification centre
+    ├── profile/               # Profile info + Set Transaction PIN
+    ├── kyc/                   # KYC verification (NIN/BVN/Ghana Card)
+    ├── welcome/               # Onboarding tour
+    └── admin/                 # Admin dashboard
 ```
 
----
+## API Integration
 
-## 🔌 API Integration
-
-This frontend connects to the **QuickTopUp.ng Django REST API**.
-
-**Base URL:** `https://unmade-backboned-agreeably.ngrok-free.dev/api` (dev)  
+**Base URL:** `https://quicktopup.it.com/api` (production) / `http://localhost:8000/api` (dev)
 **Auth:** `Authorization: Token <token>` header on all authenticated requests
 
-### Response shapes (confirmed from live API)
+## Deployment
 
-All authenticated list endpoints return a paginated DRF envelope:
-```json
-{
-  "success": true,
-  "data": {
-    "count": 42,
-    "next": "http://.../?page=2",
-    "previous": null,
-    "results": [ ... ]
-  }
-}
+### Docker
+
+```bash
+docker compose up -d
 ```
-
-Single-object endpoints return:
-```json
-{ "success": true, "data": { ... } }
-```
-
-`GET /api/notifications/` is the **only** exception — it returns the DRF paginator directly (no `success`/`data` wrapper):
-```json
-{ "count": 5, "next": null, "previous": null, "results": [ ... ] }
-```
-
-### Confirmed purchase field names (from live testing)
-
-| Endpoint | Required fields |
-|----------|----------------|
-| `POST /transactions/airtime/` | `phone`, `network` (uppercase e.g. `MTN`), `amount`, `pin` |
-| `POST /transactions/data/` | `phone`, `network`, `plan_id`, `pin` |
-| `POST /transactions/cable/` | `smart_card` (**not** `smartcard_number`), `provider` (lowercase e.g. `dstv`), `plan_id`, `pin` |
-| `POST /transactions/electricity/` | `provider` (**not** `biller`), `meter_number`, `meter_type`, `amount`, `pin` |
-| `POST /auth/set-pin/` | `new_pin`, `pin_confirm` |
-
-> ⚠️ `POST /transactions/initiate-payment/` has a server-side `NameError` and is not operational. Direct purchase endpoints above should be used instead.
-
-### Service providers
-
-| Provider | Country | Services |
-|----------|---------|----------|
-| **VTU.ng** | 🇳🇬 Nigeria | Airtime, Data, Cable, Electricity |
-| **VTPass** | 🇳🇬 Nigeria | Airtime, Data, Cable, Electricity |
-| **Hubtel** | 🇬🇭 Ghana | Airtime, Data, Mobile Money |
-| **Flutterwave** | Both | Wallet Funding Payments |
-
----
-
-## 🔒 Transaction PIN
-
-All service purchases require a 4-digit transaction PIN. Users must set their PIN first via **Profile → Security → Set Transaction PIN**, which calls:
-
-```
-POST /api/auth/set-pin/
-{ "new_pin": "1234", "pin_confirm": "1234" }
-```
-
-If no PIN is set, the API returns `{ "code": "PIN_REQUIRED", "message": "Please set your transaction PIN first" }`.
-
----
-
-## 💳 Wallet Funding
-
-Wallet funding uses Flutterwave. The flow:
-
-1. Frontend calls `POST /api/wallet/fund/` with `{ amount, payment_method, redirect_url }`
-2. Backend returns a `payment_link` from Flutterwave
-3. User is redirected to `payment_link` to complete payment
-4. Flutterwave redirects back to `redirect_url` with `?tx_ref=...&status=successful`
-5. The wallet page detects the query params and shows a success/failure toast
-
----
-
-## 🚢 Deployment
 
 ### Vercel
 
-Connect the GitHub repo — Vercel auto-detects React:
-- Build command: `npm run build`
-- Output directory: `build`
+Connect the GitHub repo — Vercel auto-detects React. The `vercel.json` rewrites `/api/*` to the backend.
 
-The `vercel.json` rewrites all `/api/*` requests to the backend to avoid CORS issues in production.
-
-### Nginx
-
-```nginx
-server {
-    listen 80;
-    server_name yourdomain.com;
-    root /var/www/quicktopup/build;
-    index index.html;
-    location / { try_files $uri /index.html; }
-}
-```
-
----
-
-## 📞 Support
+## Support
 
 - Email: quicktopup.it.com@gmail.com
-- Docs: https://docs.quicktopup.it.com
-- Status: https://status.quicktopup.it.com
 
----
+## License
 
-## 📄 License
-
-MIT © 2026 QuickTopUp.ng
+MIT © 2026 QuickTopUp

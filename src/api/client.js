@@ -1,15 +1,13 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://bydcarss.com/api';
+const BASE_URL = process.env.REACT_APP_API_BASE_URL || '/api';
 
 const client = axios.create({
   baseURL: BASE_URL,
   withCredentials: false,
   headers: {
     'Accept': 'application/json',
-    // ngrok shows a browser warning interstitial page for unrecognised browsers.
-    // This header bypasses it so we always get JSON back instead of HTML.
-    'ngrok-skip-browser-warning': '1',
+    'Content-Type': 'application/json',
   },
 });
 
