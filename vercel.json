@@ -1,19 +1,19 @@
 {
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "https://bydcarss.com/api/:path*"
+      "source": "/api/(.*)",
+      "destination": "https://bydcarss.com/api/$1"
     },
     {
       "source": "/admin",
       "destination": "https://bydcarss.com/admin/"
     },
     {
-      "source": "/admin/:path*",
-      "destination": "https://bydcarss.com/admin/:path*"
+      "source": "/admin/(.*)",
+      "destination": "https://bydcarss.com/admin/$1"
     },
     {
-      "source": "/:path*",
+      "source": "/((?!api/|admin/).*)",
       "destination": "/index.html"
     }
   ]
